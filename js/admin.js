@@ -609,6 +609,7 @@
     else if (state.tab === 'photos') renderPhotos();
     else if (state.tab === 'settings') renderSettings();
     else if (state.tab === 'preview') renderPreview();
+    else if (state.tab === 'wording') renderWording();
     else renderHelp();
   }
 
@@ -1011,6 +1012,107 @@
   }
 
   // ===================================================================
+  // Menu & wording: menu names, which items show, and the site's fixed text
+  // ===================================================================
+
+  const LABELS = window.FCCLabels;
+
+  function wordingValue(key) {
+    const custom = (state.data.site.labels || {})[key];
+    return typeof custom === 'string' && custom.trim() ? custom : LABELS.DEFAULTS[key];
+  }
+
+  function setWording(key, value) {
+    const site = state.data.site;
+    const labels = Object.assign({}, site.labels || {});
+    if (!value.trim() || value === LABELS.DEFAULTS[key]) delete labels[key];
+    else labels[key] = value;
+    if (Object.keys(labels).length) site.labels = labels; else delete site.labels;
+    changed();
+  }
+
+  function isHidden(key) { return (state.data.site.menuHidden || []).indexOf(key) >= 0; }
+
+  function setHidden(key, hide) {
+    const site = state.data.site;
+    const list = (site.menuHidden || []).filter((k) => k !== key);
+    if (hide) list.push(key);
+    if (list.length) site.menuHidden = list; else delete site.menuHidden;
+    changed();
+  }
+
+  function wordingField(key, label) {
+    const def = LABELS.DEFAULTS[key];
+    const long = def.length > 45;
+    const val = wordingValue(key);
+    return '<div class="field"' + (long ? ' style="grid-column:1/-1"' : '') + '><label for="w-' + key + '">' + esc(label) + '</label>' +
+      (long ? '<textarea id="w-' + key + '" data-w="' + key + '" rows="2">' + esc(val) + '</textarea>'
+            : '<input type="text" id="w-' + key + '" data-w="' + key + '" value="' + esc(val) + '">') +
+      '<p class="hint" data-w-hint="' + key + '"' + (val === def ? ' hidden' : '') + '>Original: “' + esc(def) + '” · <button type="button" class="link" data-w-reset="' + key + '">Restore</button></p></div>';
+  }
+
+  function renderWording() {
+    const cats = state.data.categories;
+    const menuRows = [['home', 'navHome', null]]
+      .concat(cats.map((c) => ['cat:' + c.id, null, c]))
+      .concat([['gallery', 'navGallery', null], ['about', 'navAbout', null]]);
+    view().innerHTML =
+      '<div class="view-head"><h1>Menu &amp; wording</h1>' +
+      '<button type="button" data-tab-go="preview">See it in Preview</button>' +
+      '<button type="button" class="danger" id="w-reset-all">Restore all original wording</button></div>' +
+      '<p class="hint" style="margin-top:-8px;margin-bottom:16px">Change the names in the menu and the fixed text around the site. Empty a box to go back to the original. Nothing goes live until you press Publish.</p>' +
+
+      '<div class="panel" style="margin-bottom:18px"><h2 style="font-size:26px;margin-bottom:6px">Menu</h2>' +
+      '<p class="hint" style="margin-bottom:12px">In the order shown on the site. Renaming a category here renames it everywhere (its web address stays the same); reorder categories in Site settings.</p>' +
+      '<div class="menu-rows">' + menuRows.map(([key, labelKey, cat]) =>
+        '<div class="menu-row">' +
+        '<input type="text" aria-label="Menu name" ' + (cat ? 'data-catname="' + esc(cat.id) + '" value="' + esc(cat.name) + '"' : 'data-w="' + labelKey + '" value="' + esc(wordingValue(labelKey)) + '"') + '>' +
+        '<span class="menu-kind">' + (cat ? 'Category' : key === 'home' ? 'Home page' : key === 'gallery' ? 'Gallery page' : 'About page') + '</span>' +
+        '<label class="check"><input type="checkbox" data-menu-show="' + esc(key) + '"' + (isHidden(key) ? '' : ' checked') + '> Show in menu</label>' +
+        '</div>').join('') + '</div>' +
+      '<div class="grid2" style="margin-top:14px">' + wordingField('menuButton', 'Menu button on phones') + '</div>' +
+      '</div>' +
+
+      LABELS.GROUPS.filter((g) => g.title !== 'Menu').map((g) =>
+        '<div class="panel" style="margin-bottom:18px"><h2 style="font-size:26px;margin-bottom:6px">' + esc(g.title) + '</h2>' +
+        (g.note ? '<p class="hint" style="margin-bottom:12px">' + esc(g.note) + '</p>' : '') +
+        '<div class="grid2">' + g.items.map((it) => wordingField(it[0], it[1])).join('') + '</div></div>').join('');
+
+    $$('[data-w]').forEach((el) => el.addEventListener('input', () => {
+      const key = el.getAttribute('data-w');
+      setWording(key, el.value);
+      const hint = $('[data-w-hint="' + key + '"]');
+      if (hint) hint.hidden = wordingValue(key) === LABELS.DEFAULTS[key];
+    }));
+    $$('[data-w]').forEach((el) => el.addEventListener('blur', () => {
+      if (!el.value.trim()) el.value = LABELS.DEFAULTS[el.getAttribute('data-w')];
+    }));
+    $$('[data-w-reset]').forEach((b) => b.addEventListener('click', () => {
+      const key = b.getAttribute('data-w-reset');
+      setWording(key, '');
+      $$('[data-w="' + key + '"]').forEach((el) => { el.value = LABELS.DEFAULTS[key]; });
+      $('[data-w-hint="' + key + '"]').hidden = true;
+    }));
+    $$('[data-catname]').forEach((el) => el.addEventListener('input', () => {
+      const c = state.data.categories.find((x) => x.id === el.getAttribute('data-catname'));
+      if (c && el.value.trim()) { c.name = el.value; changed(); }
+    }));
+    $$('[data-menu-show]').forEach((el) => el.addEventListener('change', () => {
+      if (!el.checked && state.data.categories.length + 3 - (state.data.site.menuHidden || []).length <= 1) {
+        el.checked = true; toast('Keep at least one item in the menu.', true); return;
+      }
+      setHidden(el.getAttribute('data-menu-show'), !el.checked);
+    }));
+    $('[data-tab-go]').addEventListener('click', () => { state.tab = 'preview'; render(); });
+    $('#w-reset-all').addEventListener('click', async () => {
+      if (!(await confirmBox('Restore all original wording?', '<p>Every menu name and text on this page goes back to the original (category names and hidden menu items stay as they are).</p>', 'Restore all', true))) return;
+      delete state.data.site.labels;
+      changed();
+      renderWording();
+    });
+  }
+
+  // ===================================================================
   // Preview: the whole site, even in maintenance mode
   // ===================================================================
 
@@ -1092,6 +1194,8 @@
       '</ol>' +
       '<p>If you close the page before publishing, the browser will warn you — unpublished changes live only in this tab.</p>' +
       '<p>If someone else (or you, on another device) published in the meantime, the admin notices and asks before overwriting their changes. To be safe, sign out and back in to load the latest version before starting new work.</p>' +
+      '<h2>Menu and wording</h2>' +
+      '<p>In <em>Menu &amp; wording</em> you can rename the menu items (Home, the categories, Gallery, About), hide items from the menu, and change the fixed text around the site: section headings on the home page, buttons, page titles and the footer. Empty a box, or press <em>Restore</em>, to go back to the original wording.</p>' +
       '<h2>Previewing the site</h2>' +
       '<p>The <em>Preview</em> tab shows the whole site inside the admin, even while maintenance mode hides it from visitors. ' +
       '<em>With my changes</em> shows how it will look after you publish; <em>Live site</em> shows what is published now. Use <em>Phone</em> to check it at phone size.</p>' +
