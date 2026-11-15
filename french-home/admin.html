@@ -21,58 +21,51 @@
   <section class="signin" id="signin" hidden>
     <div class="signin-brand">
       <h1>The French Country Club</h1>
-      <p>Admin — write stories, add photos, publish to the site</p>
+      <p>Editor’s entrance</p>
     </div>
-    <div class="signin-grid">
-      <form class="panel" id="signin-form" autocomplete="off">
-        <h2>Sign in</h2>
-        <p>There is no password. You sign in with a <strong>GitHub access token</strong> that lets this page save to your repository. It stays in this browser and is only ever sent to GitHub.</p>
-        <div class="field">
-          <label for="token">GitHub access token</label>
-          <input type="password" id="token" name="token" placeholder="github_pat_…" spellcheck="false" autocapitalize="off" required>
-        </div>
-        <div class="field">
+    <form class="panel signin-card" id="signin-form" autocomplete="off">
+      <h2>Sign in</h2>
+      <div class="field">
+        <label for="token">Your admin key</label>
+        <input type="password" id="token" name="token" placeholder="Paste your key here (it starts with github_pat_)" spellcheck="false" autocapitalize="off" required autofocus>
+      </div>
+      <label class="check"><input type="checkbox" id="remember" checked> Keep me signed in on this computer</label>
+      <div class="actions">
+        <button class="primary big" type="submit" id="signin-btn">Sign in</button>
+      </div>
+      <div class="error-box" id="signin-error" role="alert" hidden></div>
+
+      <details class="first-time" id="first-time">
+        <summary>First time here? Get your admin key (2 minutes)</summary>
+        <ol class="steps">
+          <li>Press <a class="button" id="make-token" href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">Create my key on GitHub</a> and sign in to GitHub if it asks.</li>
+          <li>The name and the <strong>Contents: Read and write</strong> permission are filled in for you. Under <strong>Repository access</strong>, choose <strong>Only select repositories</strong> and pick <code id="repo-name-step">this site's repository</code>. (If Contents isn’t set, find it under <strong>Repository permissions</strong> and choose <strong>Read and write</strong>.)</li>
+          <li>Press <strong>Generate token</strong>, copy the key it shows (GitHub only shows it once), paste it above and press <strong>Sign in</strong>.</li>
+        </ol>
+        <p class="hint">The key stays in this browser and is only ever sent to GitHub. Lost it, or worried someone else has it? Delete it on GitHub’s <a href="https://github.com/settings/personal-access-tokens" target="_blank" rel="noopener">tokens page</a> and make a new one.</p>
+      </details>
+
+      <details class="more-options" id="more-options">
+        <summary>More options</summary>
+        <div class="field" style="margin-top:12px">
           <label for="repo">Repository</label>
           <input type="text" id="repo" name="repo" placeholder="owner/repository" spellcheck="false" autocapitalize="off" required>
           <p class="hint" id="repo-hint">Found automatically when this page is opened from GitHub Pages.</p>
         </div>
-        <details>
-          <summary>Advanced</summary>
-          <div class="grid2" style="margin-top:12px">
-            <div class="field">
-              <label for="branch">Branch</label>
-              <input type="text" id="branch" placeholder="(default branch)" spellcheck="false" autocapitalize="off">
-            </div>
-            <div class="field">
-              <label for="folder">Site folder in the repository</label>
-              <input type="text" id="folder" placeholder="french-home/" spellcheck="false" autocapitalize="off">
-            </div>
+        <div class="grid2">
+          <div class="field">
+            <label for="branch">Branch</label>
+            <input type="text" id="branch" placeholder="(default branch)" spellcheck="false" autocapitalize="off">
           </div>
-        </details>
-        <label class="check" style="margin-top:14px"><input type="checkbox" id="remember"> Keep me signed in on this device</label>
-        <p class="hint">Leave this unticked on a shared computer — you will be signed out when the tab closes.</p>
-        <div class="actions">
-          <button class="primary" type="submit" id="signin-btn">Sign in</button>
-          <button type="button" id="try-btn">Try it without publishing</button>
+          <div class="field">
+            <label for="folder">Site folder in the repository</label>
+            <input type="text" id="folder" placeholder="french-home/" spellcheck="false" autocapitalize="off">
+          </div>
         </div>
-        <div class="error-box" id="signin-error" role="alert" hidden></div>
-      </form>
-
-      <div class="panel">
-        <h2>Creating your token (once)</h2>
-        <ol class="steps">
-          <li>Sign in to <a href="https://github.com" target="_blank" rel="noopener">github.com</a>. Click your profile picture (top right) → <strong>Settings</strong>.</li>
-          <li>At the bottom of the left-hand menu choose <strong>Developer settings</strong> → <strong>Personal access tokens</strong> → <strong>Fine-grained tokens</strong>.
-            <br>Or go straight to <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a>.</li>
-          <li>Click <strong>Generate new token</strong>. Give it a name such as <code>French Country Club admin</code> and pick an expiry date (90 days is sensible; you can make a new one any time).</li>
-          <li>Under <strong>Repository access</strong> choose <strong>Only select repositories</strong> and pick <code id="repo-name-step">this site's repository</code>.</li>
-          <li>Under <strong>Permissions → Repository permissions</strong>, find <strong>Contents</strong> and set it to <strong>Read and write</strong>. Leave everything else as it is (GitHub adds “Metadata: Read” by itself).</li>
-          <li>Click <strong>Generate token</strong>, then copy the token (it starts with <code>github_pat_</code>). GitHub only shows it once.</li>
-          <li>Paste it into the box on this page and press <strong>Sign in</strong>. Tick “Keep me signed in” if this is your own computer.</li>
-        </ol>
-        <p class="hint">Lost the token or think someone else has it? Delete it on the same GitHub page and create a new one. Nothing else needs changing.</p>
-      </div>
-    </div>
+        <p class="hint">On a shared computer, untick “Keep me signed in”: you are then signed out when the tab closes.</p>
+        <button type="button" id="try-btn">Look around without signing in</button>
+      </details>
+    </form>
   </section>
 
   <!-- ===== App ===== -->

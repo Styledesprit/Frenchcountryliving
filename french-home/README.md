@@ -52,7 +52,7 @@ The `hostinger-site` branch appears the first time the workflow runs: after this
 `main`, or straight away from **Actions → Update hostinger-site branch → Run workflow**.
 
 - Site: `https://thefrenchcountryclub.com/`
-- Admin: `https://thefrenchcountryclub.com/admin.html`
+- Admin: `https://thefrenchcountryclub.com/login` (short for `/admin.html`)
 
 The admin already knows which repository and folder to publish to (the `fcc-repo` and
 `fcc-folder` lines near the top of `admin.html`). After you publish, the site updates in a minute
@@ -87,7 +87,7 @@ Keep the token private, like a password. If it leaks, delete it on the same page
 
 ## 3. Use the admin
 
-Open `admin.html` on your GitHub Pages site, paste the token and press **Sign in**. On GitHub
+Open `/login` (or `admin.html`) on your site, paste the token (the admin calls it your *admin key*) and press **Sign in**. On first visit, **First time here?** has a **Create my key on GitHub** button that opens GitHub's token page with the name and the *Contents: Read and write* permission already filled in; you only pick the repository. On GitHub
 Pages the repository is detected from the address; elsewhere, type it as `owner/repository`
 (and, under *Advanced*, the folder — `french-home/` — and the branch if it isn't the default).
 

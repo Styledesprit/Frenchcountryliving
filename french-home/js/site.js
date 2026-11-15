@@ -273,7 +273,7 @@
       '<li><a href="#/about">About the club</a></li>' +
       '<li><a href="#/credits">Photo credits</a></li></ul></div>' +
       '</div><div class="footer-bottom"><span>&copy; ' + new Date().getFullYear() + ' ' + esc(s.name) + (s.author ? ' · ' + esc(s.author) : '') + '</span>' +
-      '<span><a href="#/credits">Photo credits</a> · <a href="admin.html">Admin</a></span></div></div>';
+      '<span><a href="#/credits">Photo credits</a> · <a href="login/">Admin</a></span></div></div>';
   }
 
   function parseRoute() {

@@ -193,3 +193,12 @@ input:focus, select:focus, textarea:focus { outline: 2px solid rgba(166, 93, 60,
 
 .maint-flag { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; background: #e9c46a; color: #3b2f12; padding: 5px 9px; border-radius: 999px; }
 .maint-panel.on { border-color: #d9b45a; background: #fdf6e3; }
+
+/* simplified sign-in */
+.signin-card { max-width: 520px; margin: 0 auto; }
+.signin-card .actions { margin-top: 16px; }
+button.big { padding: 14px 28px; font-size: 16px; width: 100%; justify-content: center; }
+.signin-card details { border-top: 1px solid var(--rule); margin-top: 18px; padding-top: 14px; }
+.signin-card summary { font-weight: 600; color: var(--terracotta-deep); }
+.signin-card .steps { margin-top: 12px; }
+.signin-card .steps .button { padding: 6px 10px; font-size: 13px; margin: 2px 0; }
