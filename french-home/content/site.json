@@ -1,0 +1,343 @@
+{
+  "site": {
+    "name": "The French Country Club",
+    "tagline": "A journal of French country living",
+    "description": "An open club for anyone who dreams of life in rural France, or already lives it. Houses, gardens, tables, brocante finds and journeys through the French countryside.",
+    "author": "The editors",
+    "email": "bonjour@example.com",
+    "instagram": "",
+    "quote": "The countryside is not a place you visit. It is a pace you learn to keep.",
+    "quoteBy": "A saying among the club",
+    "galleryIntro": "Shutters, orchards, markets and fields: a scrapbook of the French countryside, gathered by the club.",
+    "maintenance": false,
+    "maintenanceMessage": "The shutters are closed for a little while as we tidy the house. Please come back soon.",
+    "aboutTitle": "Welcome to the club",
+    "aboutPhoto": "village",
+    "about": "The French Country Club is not really a club at all — or rather, it is the easiest one in the world to join. There is no membership fee, no waiting list and no secret handshake. If you have ever lingered over a photograph of a shuttered farmhouse, planned a holiday around a village market, or stood in a field of lavender and wished you never had to leave, you are already a member.\n\n## Who we are\n\nWe are a small journal for people who love the French countryside: those who dream of a life in rural France, and those lucky enough to live it already. Some of us restore old houses. Some of us grow roses, or bake bread, or spend far too many Sunday mornings at the brocante. Most of us simply like to slow down.\n\nHere you will find stories about **houses** and the way they are lived in, **gardens** through the seasons, food and the people who make it **at the table**, the treasures and stories of the **brocante**, and **travels** to the corners of France that are best reached slowly.\n\n## An open invitation\n\nThe club is made by its readers. If you have a story to tell — a house you have brought back to life, a market you love, a recipe from a grandmother in the Dordogne, a village that stole your heart — we would love to hear from you.\n\n- Write to us with your story, your questions or your corrections.\n- Send us your photographs of the French countryside.\n- Tell us where we should go next.\n\n> Pull up a chair. The kettle is on, the shutters are open, and there is always room at the table.\n\n*À bientôt,* — the editors"
+  },
+  "categories": [
+    {
+      "id": "the-house",
+      "name": "The House",
+      "blurb": "Old stone, limewash and shutters: how French country houses are built, restored and lived in.",
+      "photo": "farmhouse2"
+    },
+    {
+      "id": "the-garden",
+      "name": "The Garden",
+      "blurb": "Potagers, roses and orchards through the seasons.",
+      "photo": "rosegarden"
+    },
+    {
+      "id": "at-the-table",
+      "name": "At the Table",
+      "blurb": "Markets, bakeries and the long country lunch.",
+      "photo": "market"
+    },
+    {
+      "id": "brocante",
+      "name": "Brocante",
+      "blurb": "Flea markets, antiques and the stories behind the finds.",
+      "photo": "brocante"
+    },
+    {
+      "id": "travels",
+      "name": "Travels",
+      "blurb": "Slow journeys to the villages, fields and coasts of rural France.",
+      "photo": "village"
+    }
+  ],
+  "articles": [
+    {
+      "id": "a-spring-farmhouse",
+      "slug": "spring-returns-to-a-provencal-farmhouse",
+      "title": "Spring Returns to a Provençal Farmhouse",
+      "dek": "After a winter of closed shutters and mistral, an old stone mas wakes up one window at a time.",
+      "category": "the-house",
+      "date": "2026-04-12",
+      "author": "The editors",
+      "cover": "farmhouse",
+      "body": "There is a particular sound that marks the end of winter in the south of France, and it is not birdsong. It is the scrape and knock of shutters being folded back against stone for the first time in months. In the hills above the Durance, it travels from house to house on the first truly warm morning, a kind of rolling announcement that the season has turned.\n\nAt the farmhouse we have come to know best, the opening is done in a fixed order. The kitchen first, because that is where the day begins. Then the long room facing south, where the light falls across the tiled floor in a wide gold rectangle. The bedrooms last, their shutters stiff and complaining, their hinges flecked with the rust of a wet February.\n\n## A house built to wait\n\nA Provençal *mas* is not designed for showing off. Its walls are thick because summer is fierce; its windows are small on the north side because the mistral is merciless. The roof of curved terracotta tiles is low and patient. In winter such a house turns inward, gathered around one stove and one table, and most rooms simply wait.\n\nSpring is when it remembers how large it is.\n\n> A stone house holds the cold of winter well into April, and then, one afternoon, it lets it go all at once.\n\nThe first job is airing. Every door and window is propped open and the house breathes out the smell of woodsmoke and closed linen cupboards. Rugs go over the low wall by the well to be beaten. Mattresses lean against the sunny side of the barn. It is hard work and nobody minds.\n\n![The kitchen garden comes back to life in April.](potager)\n\n## The garden comes first\n\nOutside, the almond trees have usually finished their blossom by the time the house is properly open; they flower in late February, absurdly early, as if they cannot wait. By April it is the turn of the irises along the terrace and the wild thyme on the slope behind the house. The vegetable plot is dug over and the first rows of broad beans already stand knee-high.\n\nThe old rule here is that nothing tender goes into the ground until the *saints de glace*, the ice saints' days in the middle of May, have passed. Tomatoes and courgettes wait in pots on the kitchen windowsill, leggy and impatient.\n\n## Small rituals of the season\n\n- **Whitewash.** The low walls of the courtyard are brushed with lime so they glow in the evening light.\n- **The first meal outside.** A table carried under the plane tree, a cloth that was too optimistic, a cardigan kept within reach.\n- **The fountain.** The stone basin by the door is scrubbed and refilled, and within a week there are frogs.\n- **Lavender pruned.** Last year's woody stems are cut back hard so the new growth comes up silver and full.\n\nNone of this is remarkable, and that is rather the point. Country life in France is made of small seasonal habits repeated until they become a kind of calendar. You know it is spring not because of a date, but because the shutters are open, the table has moved outdoors, and the house is full of light again.\n\n### A note for visitors\n\nIf you are lucky enough to rent an old farmhouse in spring, open everything on the first morning, even if it is cool. The house will thank you by evening.",
+      "featured": true,
+      "status": "published"
+    },
+    {
+      "id": "a-isle-sur-la-sorgue",
+      "slug": "sunday-antiques-market-isle-sur-la-sorgue",
+      "title": "Sunday Morning at L'Isle-sur-la-Sorgue",
+      "dek": "Waterwheels, plane trees and a town that turns into one long antiques market every week.",
+      "category": "brocante",
+      "date": "2026-10-25",
+      "author": "The editors",
+      "cover": "sorgue",
+      "body": "Arrive early. Everyone will tell you this, and everyone is right. By eight on a Sunday morning the dealers along the river at L'Isle-sur-la-Sorgue have already laid out their trestles, and the serious buyers, the ones with notebooks and vans parked out of sight, have already done a first lap.\n\nThe town sits where the Sorgue river divides into channels, and for centuries those channels powered mills for silk, paper and wool. Several great mossy waterwheels still turn slowly beside the quays. It is often called the Venice of the Comtat, which flatters Venice a little less than it flatters the town.\n\n## How the market works\n\nThere are really three markets folded into one. Along the quays and the main avenues are the stallholders who come every week: tables of linen, cutlery, enamel signs, copper pans and bottles. Behind them, in courtyards and old warehouses, are the permanent antiques villages, dozens of dealers under one roof, open through the weekend. And in the old streets of the centre there is the ordinary Sunday food market, so you can buy a chandelier and a roast chicken within a hundred metres.\n\n> Look at everything once before you buy anything. The piece you love at the first stall will probably be waiting at the fifth, and cheaper.\n\n![The river divides into green channels that once turned the town's mills.](sorgue-river)\n\n## What to look for\n\nThose who come for the first time are usually overwhelmed, so it helps to have a theme. Some favourites:\n\n- **Linen and hemp.** Heavy old sheets, often with a red monogram, and the striped mattress ticking that the French call *toile à matelas*.\n- **Kitchen things.** Café au lait bowls, confit pots glazed yellow and green, wire egg baskets, wooden bread boards worn into a dip.\n- **Garden pieces.** Zinc watering cans, cast-iron urns, and the folding metal chairs that seem to exist in every French park.\n- **Paper.** Old seed packets, school maps, postcards written in pencil a century ago.\n\n## The art of the price\n\nBargaining is expected, but gently. A polite *c'est votre meilleur prix ?* — is that your best price? — usually earns a small reduction, especially late in the morning or if you buy several things. Cash still helps. Dealers who ship abroad are common in the permanent halls; the stallholders on the quay mostly are not, so think about the size of your suitcase.\n\n### When to go\n\nThe Sunday market runs all year, but the town is at its liveliest from spring to early autumn. There are also two large antiques fairs, at Easter and in mid-August, when the crowds double. A quieter October Sunday, with mist on the river and the plane trees turning, is our own favourite.\n\nStay for lunch. Find a table beside the water, order whatever the day's dish is, and look at your purchases properly. That is half the pleasure.",
+      "featured": false,
+      "status": "published"
+    },
+    {
+      "id": "a-lavender-ventoux",
+      "slug": "lavender-season-below-mont-ventoux",
+      "title": "Lavender Season Below Mont Ventoux",
+      "dek": "For a few weeks each summer, the plateau around Sault turns purple, and the air smells of it for miles.",
+      "category": "travels",
+      "date": "2026-07-06",
+      "author": "The editors",
+      "cover": "lavender",
+      "body": "You smell it before you see it. Driving up from the valley towards the plateau of Sault, with the windows down because the air is cooler up here, there comes a moment when the scent arrives in the car — warm, resinous, a little like honey and a little like soap. A bend later, the fields begin.\n\nThe country between Mont Ventoux and the Montagne de Lure is high and dry and bright. At around eight hundred metres the summers are a touch less brutal than down on the plain, and the chalky soil suits lavender and its hardier cousin, lavandin, perfectly. The great bald summit of the Ventoux watches over all of it, white even in July, so that people who see it for the first time often take it for snow.\n\n## Lavender or lavandin?\n\nMost of the vast, perfectly combed rows you see are in fact lavandin, a hybrid that grows bigger and yields far more oil. It is the source of most of the lavender scent in soaps and laundry. True lavender, *lavande fine*, is smaller, greyer and grows higher up; its oil is sweeter and more precious, and it is the one used in fine perfumery and in the kitchen.\n\n> Rub a flower head between your fingers. True lavender smells soft and floral. Lavandin is sharper, with a note of camphor.\n\n![A stone farmhouse beyond a field of lavender in flower.](farmhouse2)\n\n## When to come\n\nFlowering moves with the altitude. On the lower slopes it begins in late June; around Sault the fields are usually at their peak in the first half of July. Harvest starts soon after, sometimes alarmingly soon, so a field you admired on Tuesday may be shorn stubble by Friday. Mid-August brings the lavender festival in Sault, with a market, a parade and a cutting competition with old hand sickles.\n\n## Seeing it well\n\n- **Go early or late.** The colour is richest in the low light of morning and evening, and the bees are calmer.\n- **Stay on the edges.** These are working farms. Walk along the margins and never cut through the rows.\n- **Visit a distillery.** Several farms open their stills in season. The smell inside is overwhelming, in the nicest way.\n- **Buy honey.** Lavender honey from the plateau is pale and delicate, and the best souvenir you can carry home.\n\n### The road over the mountain\n\nIf you have time, drive the road up Mont Ventoux itself. The forest gives way to a lunar slope of pale stones, and from the top, on a clear day, you can see the Alps in one direction and the glint of the Mediterranean in the other. Coming back down towards Sault, with the purple fields below, you will understand why so many people return every summer.",
+      "featured": false,
+      "status": "published"
+    },
+    {
+      "id": "a-old-roses",
+      "slug": "old-roses-worth-growing",
+      "title": "Old Roses Worth Growing",
+      "dek": "Scent, history and a generous single flush: a case for the roses our great-grandparents knew.",
+      "category": "the-garden",
+      "date": "2026-06-01",
+      "author": "The editors",
+      "cover": "rose-gallica",
+      "body": "Modern roses are very good at many things. They flower for months, they come in every colour, and they shrug off disease that would have flattened their ancestors. But stand in a French country garden in early June, in front of an old shrub rose in full bloom, and breathe in. You may find yourself wondering what we lost along the way.\n\nOld roses — the gallicas, damasks, albas and centifolias grown in Europe long before the arrival of repeat-flowering roses from China — have a reputation for being difficult. Mostly they are not. Many are tougher than any hybrid tea. What they ask is space, a little patience and acceptance that their great show comes once a year.\n\n## Why grow them\n\nThe first reason is scent. Old roses are often intensely fragrant, with a rich, rounded perfume that people describe as the true smell of roses. The second is form: flat, quartered blooms packed with petals, often with a small button eye at the centre, in colours from white through blush and pink to deep crimson and purple. The third is history. Many of these varieties were bred in France in the early nineteenth century, when the passion for roses reached a fever pitch.\n\n> A rose that flowers once, magnificently, is not a lesser rose. It is a different kind of event.\n\n![Gallica roses: flat, many-petalled and richly scented.](rose-gallica-2)\n\n## A short list to start with\n\n- **'Charles de Mills'.** A gallica with crimson-purple blooms so neatly quartered they look sliced. Tough and compact.\n- **'Madame Hardy'.** A damask of pure white with a green eye, raised in France in the 1830s. One of the loveliest white roses ever bred.\n- **'Rosa Mundi'.** The striped gallica, splashed pink and white like a sweet wrapper. Ancient and cheerful.\n- **'Duchesse de Montebello'.** A soft shell-pink gallica with a sweet scent and a gentle, spreading habit.\n- **'Cuisse de Nymphe'.** An alba with grey-green leaves and blush flowers. Its English name, 'Maiden's Blush', is far more decorous.\n\n## How to grow them well\n\nGive them sun for at least half the day and soil that does not stay waterlogged. Most old roses form loose, arching shrubs a metre or more across, so plant them where they can spread, or let them lean on a fence. They are happy in a mixed border with lavender, catmint and foxgloves at their feet.\n\n### Pruning\n\nBecause they flower on wood made the previous year, once-flowering roses should be pruned lightly *after* flowering, not in late winter. Remove a few of the oldest stems at the base and shorten long shoots by a third. That is really all.\n\n### Afterwards\n\nDo not deadhead them all. Many old roses produce handsome hips in autumn, glossy red or orange, which the birds will thank you for. And by then, of course, you will be looking forward to next June.",
+      "featured": false,
+      "status": "published"
+    },
+    {
+      "id": "a-village-bakery",
+      "slug": "the-village-bakery-and-the-daily-loaf",
+      "title": "The Village Bakery and the Daily Loaf",
+      "dek": "In rural France, the boulangerie is a clock, a newspaper and a meeting place — and the bread is the excuse.",
+      "category": "at-the-table",
+      "date": "2026-11-08",
+      "author": "The editors",
+      "cover": "bakery",
+      "body": "In most French villages the first light on in the morning belongs to the baker. Long before dawn, when the square is still dark and the café chairs are stacked, a warm yellow glow shows through the steamed-up window of the boulangerie, and the smell of baking spreads down the street.\n\nBy seven there is a queue. It is never long, but it is constant, and it is one of the best ways to understand a French village. The farmer in work boots buys four baguettes and a *pain de campagne*. The schoolchildren buy *pains au chocolat* with coins counted out in their palms. An elderly lady asks for half a loaf, *bien cuit*, well done, as she has every morning for forty years, and receives it without having to say a word.\n\n## The rules of the loaf\n\nThe French take bread seriously enough to have written rules about it. A shop may only call itself a *boulangerie* if the bread is kneaded, shaped and baked on the premises. The *baguette de tradition française* must be made without additives or preservatives, from little more than flour, water, salt and yeast or leaven. And in 2022 the craft of the baguette was recognised by UNESCO as part of the world's intangible cultural heritage.\n\n> Bread in France is bought daily, eaten the same day, and never, ever thrown away without a twinge of guilt.\n\n![A country loaf, its crust split along the score.](bread)\n\n## A brief guide to the counter\n\n- **La baguette.** The everyday loaf, best within a few hours. Many people ask for it *pas trop cuite*, not too dark.\n- **La tradition.** The better baguette: rustic, creamy inside, with a crackling crust and an uneven, open crumb.\n- **Le pain de campagne.** A round or oval country loaf, often with some rye or wholemeal flour and a sourdough tang. It keeps for days.\n- **La ficelle.** A thin, crusty string of a loaf, almost all crust.\n- **La fougasse.** A flat, leaf-shaped bread from Provence, slashed open and often studded with olives or lardons.\n\n## More than bread\n\nA village bakery is also the place where news travels. Who is selling the house by the church, whose daughter is getting married, whether the storm last night brought down the old lime tree on the road to the mill. When a village loses its bakery, people say, it begins to lose itself. Many communes go to great lengths to keep one open, sometimes offering the premises at a peppercorn rent to any baker who will come.\n\n### Eating it properly\n\nCarry your baguette home under your arm, unwrapped, as tradition demands, and do not be ashamed to break off the end, *le quignon*, and eat it on the way. Everyone does. Keep country bread wrapped in a linen cloth, cut side down on the board. And yesterday's bread is never wasted: it becomes *pain perdu*, soaked in milk and egg and fried in butter, which is the best reason of all to buy too much.",
+      "featured": false,
+      "status": "published"
+    },
+    {
+      "id": "a-normandy-cottage",
+      "slug": "a-thatched-cottage-in-normandy",
+      "title": "A Thatched Cottage in Normandy",
+      "dek": "Half-timbering, apple orchards and a roof that grows its own garden of irises.",
+      "category": "the-house",
+      "date": "2026-09-14",
+      "author": "The editors",
+      "cover": "chaumiere",
+      "body": "Southern France has its stone and its terracotta; Normandy has timber, cob and thatch. Travel through the Pays d'Auge or the Marais-Vernier on a soft grey morning and you will pass cottages that look as if they grew up out of the meadow: walls of oak frames filled with clay and straw, a heavy roof of reed pulled down low over the windows like a hat, and on the ridge, unexpectedly, a row of flowers.\n\nThese are the *chaumières* of Normandy, and they are among the most appealing country houses in France.\n\n## How they are made\n\nThe frame of a traditional Norman cottage is oak, cut and pegged together without nails. The spaces between the timbers are filled with *torchis*, a mix of clay, straw and sometimes cow hair, pressed onto a lattice of split chestnut laths. The whole is then limewashed, so the walls glow cream or ochre between the dark beams. It is a supple, breathing way of building, well suited to a damp, mild climate.\n\nThe roof is the glory. Thatch here is usually reed from the river marshes, or wheat straw, laid thick and combed smooth. It keeps the house warm in winter and cool in summer, and a well-made roof can last decades.\n\n> The irises on the ridge are not decoration. Their roots bind the clay that seals the top of the roof, and they keep the rain out.\n\n![Apple orchards surround many of the old cottages.](orchard)\n\n## The flowered ridge\n\nThe most charming detail of all is the *faîtage*, the ridge. Instead of tiles, many Norman thatchers finish the top with a thick band of clay, then plant it with irises, houseleeks or other tough, shallow-rooted plants. In late spring the ridge flowers purple and blue. Few roofs anywhere in the world are quite so pretty.\n\n## Living in one\n\nOwners will tell you that a thatched cottage is a relationship rather than a house. There are compromises:\n\n- **Light.** The deep eaves and small windows make for cosy, dim interiors. Pale limewashed walls help.\n- **Fire.** Chimneys must be swept and spark guards fitted; insurers are understandably particular.\n- **Upkeep.** The ridge needs renewing every ten or fifteen years and the whole roof perhaps every thirty to forty.\n- **Wildlife.** Birds love thatch. Wire netting keeps the worst of the nesting at bay.\n\n### The garden around it\n\nThe setting matters as much as the house. The classic cottage stands in a grassy orchard of cider apples and perry pears, with a few cows grazing beneath the trees and a hedge of hazel and hawthorn around the edge. Inside the gate there is usually a rambling rose over the door, a bench under the window and hollyhocks against the wall. Come in May, when the orchards are in blossom and the irises flower on the roof, and you will find it very hard to leave.",
+      "featured": false,
+      "status": "published"
+    },
+    {
+      "id": "a-camargue-mas",
+      "slug": "the-whitewashed-mas-of-the-camargue",
+      "title": "The Whitewashed Mas of the Camargue",
+      "dek": "Between the salt marshes and the sea, low white farmhouses keep company with horses, bulls and flamingos.",
+      "category": "travels",
+      "date": "2026-08-17",
+      "author": "The editors",
+      "cover": "camargue",
+      "body": "The Camargue is not like the rest of Provence. There are no hill villages and no terraces of olives here. Where the Rhône divides before it reaches the Mediterranean, the land flattens into a wide, shimmering delta of marsh, rice field, lagoon and salt pan, under a sky so large it can feel like being at sea.\n\nIt is a landscape of white things: the white horses, the white salt heaped in great dunes at Salin-de-Giraud, the egrets in the reeds and, scattered across the plain, the long low whitewashed farmhouses called *mas*.\n\n## Houses for a hard country\n\nA Camargue mas is built for wind, sun and water. Its walls are thick and limewashed brilliant white to throw back the heat. Windows are few on the north side, where the mistral comes screaming down the Rhône valley. The roof is often of curved Roman tiles; older buildings and the little herdsmen's huts, the *cabanes de gardian*, are thatched with the reed that grows everywhere in the marshes, their rounded backs turned to the wind like animals sheltering.\n\nAround the main house stand the working buildings: stables for the horses, pens for the black bulls, a dovecote, a barn. A line of tall cypress or tamarisk usually guards the farmyard against the wind.\n\n> The gardians say a Camargue horse is born dark and turns white with age, and that it can walk in water all day without complaining.\n\n![The famous white horses graze the wet meadows of the delta.](camargue-horses)\n\n## The life of the mas\n\nMany of these farms still raise the small black Camargue bulls and the hardy local horses, managed on horseback by the *gardians*, the herdsmen of the delta, with their broad hats and long three-pronged sticks. Others grow rice, which thrives in the flooded fields and has its own protected name. A growing number open their doors as guesthouses, with long tables under the plane trees and simple rooms with tiled floors and wrought-iron beds.\n\n## Visiting well\n\n- **Bring binoculars.** Greater flamingos feed in the lagoons all year; in spring they gather in the thousands.\n- **Ride.** Many mas offer rides on Camargue horses along the marsh paths. It is the best way to see the wild places.\n- **Respect the bulls.** The black bulls in the fields are not pets. Admire them over the fence.\n- **Mind the mosquitoes.** On still summer evenings they are legendary. Long sleeves and a breeze help.\n\n### A table in the delta\n\nEat what the land gives you: a *gardiane de taureau*, bull stewed slowly in red wine with olives and served over Camargue rice; tellines, tiny clams from the beaches, fried with garlic and parsley; and, to finish, a slice of *fougasse d'Aigues-Mortes*, sweet and scented with orange flower water. Then sit outside as the sun goes down over the marsh, turning the white walls of the mas pink, then gold, then blue.",
+      "featured": false,
+      "status": "published"
+    }
+  ],
+  "photos": [
+    {
+      "id": "farmhouse",
+      "src": "content/photos/farmhouse.jpg",
+      "caption": "An old stone mas in Provence",
+      "credit": "Arnaud 25 / Wikimedia Commons",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Mas_08.jpg",
+      "gallery": true
+    },
+    {
+      "id": "farmhouse2",
+      "src": "content/photos/farmhouse2.jpg",
+      "caption": "A stone farmhouse beyond a field of lavender",
+      "credit": "Arnaud 25 / Wikimedia Commons",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Mas_07.jpg",
+      "gallery": true
+    },
+    {
+      "id": "brocante",
+      "src": "content/photos/brocante.jpg",
+      "caption": "The weekly brocante under the plane trees at Carpentras",
+      "credit": "Marianne Casamance / Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Brocante_hebdomadaire.jpg",
+      "gallery": true
+    },
+    {
+      "id": "sorgue",
+      "src": "content/photos/sorgue.jpg",
+      "caption": "The quai Jean Jaurès at L'Isle-sur-la-Sorgue",
+      "credit": "Jorge Franganillo / Wikimedia Commons",
+      "license": "CC BY 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:L%27Isle-sur-la-Sorgue_-_Quai_Jean_Jaur%C3%A8s.jpg",
+      "gallery": true
+    },
+    {
+      "id": "sorgue-river",
+      "src": "content/photos/sorgue-river.jpg",
+      "caption": "The Sorgue running through L'Isle-sur-la-Sorgue",
+      "credit": "François de Dijon / Wikimedia Commons",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:L%27Isle-sur-la-Sorgue_06.jpg",
+      "gallery": true
+    },
+    {
+      "id": "lavender",
+      "src": "content/photos/lavender.jpg",
+      "caption": "Lavender below Mont Ventoux",
+      "credit": "Robert Brink / Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lavender_field_and_Mont_Ventoux.jpg",
+      "gallery": true
+    },
+    {
+      "id": "rose-gallica",
+      "src": "content/photos/rose-gallica.jpg",
+      "caption": "Gallica rose 'Charles de Mills'",
+      "credit": "Patrick Nouhailler / Wikimedia Commons",
+      "license": "CC BY-SA 2.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Rosa_gallica_%22Charles_de_Mills%22_(Niederlander_vor_1700)_(25924200838).jpg",
+      "gallery": true
+    },
+    {
+      "id": "rose-gallica-2",
+      "src": "content/photos/rose-gallica-2.jpg",
+      "caption": "Gallica rose 'Duchesse de Montebello'",
+      "credit": "Patrick Nouhailler / Wikimedia Commons",
+      "license": "CC BY-SA 2.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Rosa_gallica_%22Duchesse_de_Montebello%22_(Laffay_1824)_(38897751865).jpg",
+      "gallery": true
+    },
+    {
+      "id": "rose-damask",
+      "src": "content/photos/rose-damask.jpg",
+      "caption": "Damask rose 'Madame Hardy'",
+      "credit": "Kritzolina / Wikimedia Commons",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Damaszener-Rose_%27Madame_Hardy%27_im_botanischen_Garten_M%C3%BCnchen-Nymphenburg_03.jpg",
+      "gallery": true
+    },
+    {
+      "id": "rosegarden",
+      "src": "content/photos/rosegarden.jpg",
+      "caption": "A French rose garden in early summer",
+      "credit": "Nolanna / Wikimedia Commons",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Jardin_Botanique_et_Roseraie,_France.jpg",
+      "gallery": true
+    },
+    {
+      "id": "bakery",
+      "src": "content/photos/bakery.jpg",
+      "caption": "A village bakery in Montmoreau, Charente",
+      "credit": "JLPC / Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Montmoreau_16_Boulangerie_2011.jpg",
+      "gallery": true
+    },
+    {
+      "id": "bread",
+      "src": "content/photos/bread.jpg",
+      "caption": "A French country loaf",
+      "credit": "Shisma / Wikimedia Commons",
+      "license": "CC BY 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Franz%C3%B6sisches_Landbrot_2.jpg",
+      "gallery": true
+    },
+    {
+      "id": "chaumiere",
+      "src": "content/photos/chaumiere.jpg",
+      "caption": "A half-timbered thatched cottage in the Eure, Normandy",
+      "credit": "Jebulon / Wikimedia Commons",
+      "license": "CC0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Chaumi%C3%A8re_Saint-Philbert2.jpg",
+      "gallery": true
+    },
+    {
+      "id": "chaumiere-caux",
+      "src": "content/photos/chaumiere-caux.jpg",
+      "caption": "A thatched cottage near the plateau de Caux, Normandy",
+      "credit": "Pline / Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Maison_normande_pr%C3%A8s_du_Val_de_la_Haie_en_descendant_du_plateau_de_Caux_DSC_0037.jpg",
+      "gallery": true
+    },
+    {
+      "id": "orchard",
+      "src": "content/photos/orchard.jpg",
+      "caption": "Cows grazing an apple orchard at Le Tilleul, Normandy",
+      "credit": "Philippe Alès / Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Le_Tilleul_(France),_apple_orchard_with_grazing_cows.JPG",
+      "gallery": true
+    },
+    {
+      "id": "camargue",
+      "src": "content/photos/camargue.jpg",
+      "caption": "A whitewashed, reed-thatched gardian's cabin in the Camargue",
+      "credit": "Véronique Pagnier / Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Cabane_de_gardian_1.jpg",
+      "gallery": true
+    },
+    {
+      "id": "camargue-horses",
+      "src": "content/photos/camargue-horses.jpg",
+      "caption": "Camargue horses at Saint-Laurent-d'Aigouze",
+      "credit": "Benjamin Smith / Wikimedia Commons",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Saint-Laurent-d%27Aigouze_-_Camargue_horses_-_04.jpg",
+      "gallery": true
+    },
+    {
+      "id": "village",
+      "src": "content/photos/village.jpg",
+      "caption": "The hill village of Gordes, Provence",
+      "credit": "Holger Uwe Schmitt / Wikimedia Commons",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:%22Gordes_ist_ein_malerisches_Dorf%22._01.jpg",
+      "gallery": true
+    },
+    {
+      "id": "market",
+      "src": "content/photos/market.jpg",
+      "caption": "Vegetables at a French market",
+      "credit": "FrogsLegs71 / Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Vegetables_for_sale_in_a_market_in_France.jpg",
+      "gallery": true
+    },
+    {
+      "id": "sunflower",
+      "src": "content/photos/sunflower.jpg",
+      "caption": "Sunflowers and lavender at sunrise near Forcalquier",
+      "credit": "Broenberr / Wikimedia Commons",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Tournesols_et_lavande_Alpes_de_Haute_Provence.jpg",
+      "gallery": true
+    },
+    {
+      "id": "potager",
+      "src": "content/photos/potager.jpg",
+      "caption": "A French kitchen garden",
+      "credit": "Arnaud 25 / Wikimedia Commons",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Jardin_potager_013.jpg",
+      "gallery": true
+    },
+    {
+      "id": "vineyard",
+      "src": "content/photos/vineyard.jpg",
+      "caption": "A vineyard in the Luberon in September",
+      "credit": "Allie_Caulfield / Wikimedia Commons",
+      "license": "CC BY 2.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:2005-09-17_Provence_Luberon_vineyard.jpg",
+      "gallery": true
+    }
+  ]
+}
