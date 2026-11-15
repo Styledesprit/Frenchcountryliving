@@ -195,6 +195,22 @@
       : det ? 'Found automatically from this page’s address. Change it only if it is wrong.'
       : 'Type it as owner/repository, e.g. jane/french-country-club.';
     if ($('#repo').value) $('#repo-name-step').textContent = $('#repo').value;
+    else $('#more-options').open = true;   // nothing detected: the repository must be typed
+    updateTokenLink();
+  }
+
+  // A link to GitHub's "new token" page with the name, owner and permission filled in.
+  function updateTokenLink() {
+    const repo = $('#repo').value.trim();
+    const owner = repo.split('/')[0];
+    const params = new URLSearchParams({
+      name: 'French Country Club admin',
+      description: 'Lets thefrenchcountryclub admin page publish to ' + (repo || 'the site repository'),
+      expires_in: '365',
+      contents: 'write'
+    });
+    if (owner) params.set('target_name', owner);
+    $('#make-token').href = 'https://github.com/settings/personal-access-tokens/new?' + params.toString();
   }
 
   async function signIn(auth, remember, quiet) {
@@ -218,7 +234,7 @@
   }
 
   function friendlyError(e, auth) {
-    if (e.status === 401) return 'GitHub did not accept that token. It may be mistyped, expired or deleted — create a new one using the steps on this page.';
+    if (e.status === 401) return 'GitHub did not accept that key. It may be mistyped, expired or deleted — make a new one with “First time here?” below.';
     if (e.status === 404) return 'GitHub could not find ' + (auth ? '“' + auth.repo + '”' : 'the repository') +
       ' with this token, or could not find the site’s content/site.json. Check the repository name, and that the token was given access to this repository (Repository access → Only select repositories).';
     if (e.status === 403) return 'GitHub refused the request: ' + e.message + '. Check the token has Contents: Read and write.';
@@ -230,11 +246,11 @@
     e.preventDefault();
     const token = $('#token').value.trim();
     const repo = $('#repo').value.trim().replace(/^https?:\/\/github\.com\//i, '').replace(/\.git$/, '').replace(/\/+$/, '');
-    if (!/^[\w.-]+\/[\w.-]+$/.test(repo)) { showSignin('Please type the repository as owner/repository.'); return; }
+    if (!/^[\w.-]+\/[\w.-]+$/.test(repo)) { $('#more-options').open = true; showSignin('Please type the repository as owner/repository (under “More options”).'); return; }
     signIn({ token, repo, branchChosen: $('#branch').value.trim(), folder: normFolder($('#folder').value) }, $('#remember').checked);
   });
 
-  $('#repo').addEventListener('input', () => { $('#repo-name-step').textContent = $('#repo').value || 'this site’s repository'; });
+  $('#repo').addEventListener('input', () => { $('#repo-name-step').textContent = $('#repo').value || 'this site’s repository'; updateTokenLink(); });
 
   $('#try-btn').addEventListener('click', async () => {
     try {
@@ -1179,5 +1195,6 @@
     signIn(saved, remember, true);
   } else {
     showSignin();
+    $('#first-time').open = true;
   }
 })();
