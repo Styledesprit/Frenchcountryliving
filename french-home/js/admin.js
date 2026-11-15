@@ -568,6 +568,8 @@
 
   function changed() {
     const n = changeCount();
+    const ps = $('#preview-status');
+    if (ps) ps.innerHTML = previewStatus();
     const flag = $('#maint-flag');
     if (flag) {
       const live = !!(state.base && state.base.site.maintenance), want = !!state.data.site.maintenance;
@@ -1119,20 +1121,21 @@
   const DEVICES = { desktop: '100%', tablet: '820px', phone: '390px' };
 
   function renderPreview() {
-    const n = changeCount();
-    const live = state.mode === 'preview' ? 'Published version' : 'Live site';
     view().innerHTML =
       '<div class="view-head"><h1>Preview</h1>' +
-      '<a class="button" href="index.html?preview" target="_blank" rel="noopener">Open the live site in a new tab</a></div>' +
+      '<a class="button" href="index.html?preview" target="_blank" rel="noopener">Open the published site in a new tab</a></div>' +
+      '<div class="status-box" id="preview-status">' + previewStatus() + '</div>' +
       '<div class="preview-bar">' +
-      '<div class="seg" role="group" aria-label="What to show">' +
-      '<button type="button" data-pmode="edits" aria-pressed="' + (state.previewMode === 'edits') + '">With my changes' + (n ? ' (' + n + ' unpublished)' : '') + '</button>' +
-      '<button type="button" data-pmode="live" aria-pressed="' + (state.previewMode === 'live') + '">' + live + '</button></div>' +
+      '<span class="bar-label">Show me:</span>' +
+      '<div class="seg" role="group" aria-label="Which version to show">' +
+      '<button type="button" data-pmode="edits" aria-pressed="' + (state.previewMode === 'edits') + '">With my edits</button>' +
+      '<button type="button" data-pmode="live" aria-pressed="' + (state.previewMode === 'live') + '">As published now</button></div>' +
+      '<span class="bar-label">Screen:</span>' +
       '<div class="seg" role="group" aria-label="Screen size">' +
       Object.keys(DEVICES).map((d) => '<button type="button" data-pdev="' + d + '" aria-pressed="' + (state.previewDevice === d) + '">' +
         d.charAt(0).toUpperCase() + d.slice(1) + '</button>').join('') +
       '</div></div>' +
-      '<p class="hint" id="preview-note">' + previewNote() + '</p>' +
+      '<p class="preview-caption" id="preview-note">' + previewNote() + '</p>' +
       '<div class="preview-stage"><iframe id="preview-frame" title="Site preview" style="width:' + DEVICES[state.previewDevice] + '" src="' +
       previewSrc('#/') + '"></iframe></div>';
 
@@ -1150,6 +1153,26 @@
     }));
   }
 
+  // Two plain facts: what visitors get today, and what is waiting to be published.
+  function previewStatus() {
+    const n = changeCount();
+    const hiddenNow = !!state.base.site.maintenance;
+    const hiddenAfter = !!state.data.site.maintenance;
+    const visitors = hiddenNow
+      ? '<span class="dot-state off"></span>the <em>“' + esc(T_admin('maintTitle')) + '”</em> page. The site is hidden (maintenance mode is on).'
+      : '<span class="dot-state on"></span>the full website.';
+    let edits = n
+      ? '<strong>' + n + '</strong> — press <em>Publish</em> to put them online.'
+      : 'none — the website is up to date.';
+    if (n && hiddenNow !== hiddenAfter) {
+      edits += hiddenAfter ? ' After publishing, the site will be hidden behind the maintenance page.' : ' After publishing, the site will be open to everyone.';
+    }
+    return '<p><strong>Visitors see now:</strong> ' + visitors + '</p>' +
+      '<p><strong>Edits not yet published:</strong> ' + edits + '</p>';
+  }
+
+  function T_admin(key) { return window.FCCLabels.make(state.base.site.labels)(key); }
+
   function previewSrc(hash) {
     return (state.previewMode === 'edits' ? 'index.html?adminpreview' : 'index.html?preview&t=' + Date.now()) + (hash || '#/');
   }
@@ -1159,11 +1182,9 @@
   }
 
   function previewNote() {
-    const maint = state.data.site.maintenance
-      ? ' Maintenance mode is on, so visitors currently see only the “back soon” notice. This preview shows the whole site anyway.' : '';
-    return (state.previewMode === 'edits'
-      ? 'Showing the site as it will look once you publish, including unpublished stories, photos and settings. Drafts stay hidden, as on the real site.'
-      : 'Showing what is published right now. A publish can take a minute or two to appear.') + maint;
+    return state.previewMode === 'edits'
+      ? 'Below: the website as it <strong>will look after you press Publish</strong>.'
+      : 'Below: the website as it is <strong>published now</strong>, shown in full even while visitors see the maintenance page.';
   }
 
   // The preview page asks for content when it loads; send it the admin's working copy.
@@ -1198,7 +1219,7 @@
       '<p>In <em>Menu &amp; wording</em> you can rename the menu items (Home, the categories, Gallery, About), hide items from the menu, and change the fixed text around the site: section headings on the home page, buttons, page titles and the footer. Empty a box, or press <em>Restore</em>, to go back to the original wording.</p>' +
       '<h2>Previewing the site</h2>' +
       '<p>The <em>Preview</em> tab shows the whole site inside the admin, even while maintenance mode hides it from visitors. ' +
-      '<em>With my changes</em> shows how it will look after you publish; <em>Live site</em> shows what is published now. Use <em>Phone</em> to check it at phone size.</p>' +
+      'At the top it tells you what visitors see right now and how many edits are not yet published. <em>With my edits</em> shows how the site will look after you press Publish; <em>As published now</em> shows the website as it is today. Use <em>Phone</em> to check it at phone size.</p>' +
       '<h2>Maintenance mode</h2>' +
       '<p>To take the site offline for a while, tick <em>Maintenance mode</em> at the top of <em>Site settings</em>, write a short message and publish. Visitors then see only that notice. ' +
       'Add <code>?preview</code> to the site’s address to look at it yourself. Untick and publish again to reopen. It hides the site, but is not a password.</p>' +
