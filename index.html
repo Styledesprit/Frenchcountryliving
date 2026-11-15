@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The French Country Club — A journal of French country living</title>
+  <meta name="description" content="A journal of French country living: houses, gardens, tables, brocante and travels in rural France.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Karla:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/site.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23a65d3c'/%3E%3Ctext x='32' y='45' font-family='Georgia,serif' font-size='38' text-anchor='middle' fill='%23f7f2e9'%3EF%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="masthead">
+    <div class="wrap masthead-top">
+      <div class="masthead-tag" id="masthead-date"></div>
+      <a class="wordmark" href="#/" aria-label="The French Country Club — home">
+        <span class="wordmark-name" data-site="name">The French Country Club</span>
+        <span class="wordmark-tagline" data-site="tagline">A journal of French country living</span>
+      </a>
+      <div class="masthead-actions">
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav"><span class="bars" aria-hidden="true"></span>Menu</button>
+      </div>
+    </div>
+    <nav class="nav" id="site-nav" aria-label="Sections">
+      <ul id="nav-list"></ul>
+    </nav>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <div class="loading">Opening the shutters…</div>
+  </main>
+
+  <footer class="footer" id="footer"></footer>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer" hidden>
+    <span class="lb-count" id="lb-count"></span>
+    <button class="lb-btn lb-close" type="button" aria-label="Close (Escape)">&times;</button>
+    <button class="lb-btn lb-prev" type="button" aria-label="Previous photo">&#8249;</button>
+    <figure>
+      <img id="lb-img" alt="">
+      <figcaption id="lb-cap"></figcaption>
+    </figure>
+    <button class="lb-btn lb-next" type="button" aria-label="Next photo">&#8250;</button>
+  </div>
+
+  <script src="js/markdown.js"></script>
+  <script src="js/site.js"></script>
+</body>
+</html>

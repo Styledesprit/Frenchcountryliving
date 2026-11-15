@@ -1,0 +1,2 @@
+Generated from french-home/ on main by .github/workflows/hostinger-site.yml.
+Do not edit this branch: use the admin, or change french-home/ on main.
