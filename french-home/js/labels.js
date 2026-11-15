@@ -76,5 +76,52 @@
     };
   }
 
+  // ---------- Structure: menu order, extra pages and links, home page sections ----------
+  //
+  // site.json may hold (all optional; without them the site keeps its original layout):
+  //   site.menuOrder   ["home", "cat:<id>", "gallery", "about", "page:<id>", "link:<id>", ...]
+  //   site.menuHidden  keys left out of the menu
+  //   site.menuLinks   [{ id, label, url }]   links to other websites (or pages of this one)
+  //   pages            [{ id, slug, title, dek, photo, body, status }]   extra pages: #/page/<slug>
+  //   site.homeOrder   order of the home page sections (keys of HOME_SECTIONS)
+  //   site.homeHidden  home page sections that are switched off
+  //   site.latestCount, site.moreCount   number of stories in those sections
+
+  var HOME_SECTIONS = [
+    ['hero', 'Big top story (the featured story)'],
+    ['latest', 'Latest stories'],
+    ['explore', 'Category tiles'],
+    ['feature', 'Large feature story'],
+    ['quote', 'Quote'],
+    ['more', 'More stories'],
+    ['strip', 'Photo strip']
+  ];
+
+  function ordered(all, saved) {
+    var order = (saved || []).filter(function (k) { return all.indexOf(k) >= 0; });
+    all.forEach(function (k) { if (order.indexOf(k) < 0) order.push(k); });
+    return order;
+  }
+
+  function menuKeys(data) {
+    var site = data.site || {};
+    var all = ['home']
+      .concat((data.categories || []).map(function (c) { return 'cat:' + c.id; }))
+      .concat(['gallery', 'about'])
+      .concat((data.pages || []).map(function (p) { return 'page:' + p.id; }))
+      .concat((site.menuLinks || []).map(function (l) { return 'link:' + l.id; }));
+    return ordered(all, site.menuOrder);
+  }
+
+  function homeKeys(site) {
+    return ordered(HOME_SECTIONS.map(function (s) { return s[0]; }), (site || {}).homeOrder);
+  }
+
+  function count(value, fallback) {
+    var n = parseInt(value, 10);
+    return isNaN(n) ? fallback : Math.max(0, Math.min(12, n));
+  }
+
   global.FCCLabels = { GROUPS: GROUPS, DEFAULTS: DEFAULTS, make: make };
+  global.FCCStructure = { HOME_SECTIONS: HOME_SECTIONS, menuKeys: menuKeys, homeKeys: homeKeys, count: count };
 })(typeof window !== 'undefined' ? window : globalThis);

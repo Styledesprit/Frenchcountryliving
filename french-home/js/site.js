@@ -92,65 +92,77 @@
   function viewHome() {
     var list = published();
     if (!list.length) return '<div class="wrap"><p class="empty">' + esc(T('noStories')) + '</p></div>';
-    var hero = list.filter(function (a) { return a.featured; })[0] || list[0];
-    var rest = list.filter(function (a) { return a !== hero; });
-    var latest = rest.slice(0, 3);
-    var feature = rest[3];
-    var more = rest.slice(4, 10);
+    var S = window.FCCStructure;
+    var site = data.site;
+    var hidden = site.homeHidden || [];
+    var order = S.homeKeys(site).filter(function (k) { return hidden.indexOf(k) < 0; });
+    var on = function (k) { return order.indexOf(k) >= 0; };
+
+    // Stories are handed out in reading order, so no story appears twice.
+    var pool = list.slice();
+    var take = function (n) { return pool.splice(0, n); };
+    var hero = null, latest = [], feature = null, more = [];
+    if (on('hero')) {
+      hero = list.filter(function (a) { return a.featured; })[0] || list[0];
+      pool.splice(pool.indexOf(hero), 1);
+    }
+    order.forEach(function (k) {
+      if (k === 'latest') latest = take(S.count(site.latestCount, 3));
+      if (k === 'feature') feature = take(1)[0] || null;
+      if (k === 'more') more = take(S.count(site.moreCount, 6));
+    });
     var strip = (data.photos || []).filter(function (p) { return p.gallery; }).slice(0, 6);
-    var s = data.site;
-    var html = '';
 
-    html += '<section class="hero">' +
-      '<div class="hero-media">' + img(hero.cover, { eager: true, alt: '' }) + '</div>' +
-      '<div class="hero-text"><div class="wrap">' +
-      catLabel(hero) +
-      '<h1><a href="' + articleHref(hero) + '">' + esc(hero.title) + '</a></h1>' +
-      (hero.dek ? '<p class="dek">' + esc(hero.dek) + '</p>' : '') +
-      '<a class="btn" href="' + articleHref(hero) + '">' + esc(T('heroButton')) + '</a>' +
-      '</div></div></section>';
-
-    if (latest.length) {
-      html += '<section class="section wrap"><div class="section-head"><h2>' + esc(T('latestTitle')) + '</h2>' +
-        '<a href="#/journal">' + esc(T('latestLink')) + '</a></div><div class="cards">' + latest.map(card).join('') + '</div></section>';
-    }
-
-    if ((data.categories || []).length) {
-      html += '<section class="section wrap"><div class="section-head"><h2>' + esc(T('exploreTitle')) + '</h2></div><div class="tiles">' +
-        data.categories.map(function (c) {
-          return '<a class="tile" href="#/journal/' + encodeURIComponent(c.id) + '"><div class="ratio">' + img(c.photo, { alt: '' }) + '</div>' +
-            '<div class="tile-text"><strong>' + esc(c.name) + '</strong>' + (c.blurb ? '<span>' + esc(c.blurb) + '</span>' : '') + '</div></a>';
-        }).join('') + '</div></section>';
-    }
-
-    if (feature) {
-      html += '<section class="section wrap"><a class="feature" href="' + articleHref(feature) + '">' +
-        '<div class="ratio">' + img(feature.cover, { alt: '' }) + '</div>' +
-        '<div class="feature-text">' + catLabel(feature) + '<h2>' + esc(feature.title) + '</h2>' +
-        (feature.dek ? '<p class="dek">' + esc(feature.dek) + '</p>' : '') +
-        '<div class="meta">' + fmtDate(feature.date) + '<span class="dot">·</span>' + MD.readingMinutes(feature.body) + ' ' + esc(T('minRead')) + '</div>' +
-        '</div></a></section>';
-    }
-
-    if (s.quote) {
-      html += '<section class="pull"><blockquote>' + esc(s.quote) + '</blockquote>' +
-        (s.quoteBy ? '<cite>' + esc(s.quoteBy) + '</cite>' : '') + '</section>';
-    }
-
-    if (more.length) {
-      html += '<section class="section wrap"><div class="section-head"><h2>' + esc(T('moreTitle')) + '</h2>' +
-        '<a href="#/journal">' + esc(T('moreLink')) + '</a></div><div class="cards">' + more.map(card).join('') + '</div></section>';
-    }
-
-    if (strip.length) {
-      html += '<section class="section wrap"><div class="section-head"><h2>' + esc(T('stripTitle')) + '</h2>' +
-        '<a href="#/gallery">' + esc(T('stripLink')) + '</a></div><div class="strip">' +
-        strip.map(function (p) {
-          return '<a href="#/gallery" aria-label="' + esc(p.caption || 'Open the gallery') + '"><div class="ratio r-1x1">' + img(p.id) + '</div></a>';
-        }).join('') + '</div></section>';
-    }
+    var parts = {
+      hero: function () {
+        return '<section class="hero">' +
+          '<div class="hero-media">' + img(hero.cover, { eager: true, alt: '' }) + '</div>' +
+          '<div class="hero-text"><div class="wrap">' +
+          catLabel(hero) +
+          '<h1><a href="' + articleHref(hero) + '">' + esc(hero.title) + '</a></h1>' +
+          (hero.dek ? '<p class="dek">' + esc(hero.dek) + '</p>' : '') +
+          '<a class="btn" href="' + articleHref(hero) + '">' + esc(T('heroButton')) + '</a>' +
+          '</div></div></section>';
+      },
+      latest: function () {
+        return latest.length ? '<section class="section wrap"><div class="section-head"><h2>' + esc(T('latestTitle')) + '</h2>' +
+          '<a href="#/journal">' + esc(T('latestLink')) + '</a></div><div class="cards">' + latest.map(card).join('') + '</div></section>' : '';
+      },
+      explore: function () {
+        return (data.categories || []).length ? '<section class="section wrap"><div class="section-head"><h2>' + esc(T('exploreTitle')) + '</h2></div><div class="tiles">' +
+          data.categories.map(function (c) {
+            return '<a class="tile" href="#/journal/' + encodeURIComponent(c.id) + '"><div class="ratio">' + img(c.photo, { alt: '' }) + '</div>' +
+              '<div class="tile-text"><strong>' + esc(c.name) + '</strong>' + (c.blurb ? '<span>' + esc(c.blurb) + '</span>' : '') + '</div></a>';
+          }).join('') + '</div></section>' : '';
+      },
+      feature: function () {
+        return feature ? '<section class="section wrap"><a class="feature" href="' + articleHref(feature) + '">' +
+          '<div class="ratio">' + img(feature.cover, { alt: '' }) + '</div>' +
+          '<div class="feature-text">' + catLabel(feature) + '<h2>' + esc(feature.title) + '</h2>' +
+          (feature.dek ? '<p class="dek">' + esc(feature.dek) + '</p>' : '') +
+          '<div class="meta">' + fmtDate(feature.date) + '<span class="dot">·</span>' + MD.readingMinutes(feature.body) + ' ' + esc(T('minRead')) + '</div>' +
+          '</div></a></section>' : '';
+      },
+      quote: function () {
+        return site.quote ? '<section class="pull"><blockquote>' + esc(site.quote) + '</blockquote>' +
+          (site.quoteBy ? '<cite>' + esc(site.quoteBy) + '</cite>' : '') + '</section>' : '';
+      },
+      more: function () {
+        return more.length ? '<section class="section wrap"><div class="section-head"><h2>' + esc(T('moreTitle')) + '</h2>' +
+          '<a href="#/journal">' + esc(T('moreLink')) + '</a></div><div class="cards">' + more.map(card).join('') + '</div></section>' : '';
+      },
+      strip: function () {
+        return strip.length ? '<section class="section wrap"><div class="section-head"><h2>' + esc(T('stripTitle')) + '</h2>' +
+          '<a href="#/gallery">' + esc(T('stripLink')) + '</a></div><div class="strip">' +
+          strip.map(function (p) {
+            return '<a href="#/gallery" aria-label="' + esc(p.caption || 'Open the gallery') + '"><div class="ratio r-1x1">' + img(p.id) + '</div></a>';
+          }).join('') + '</div></section>' : '';
+      }
+    };
     setTitle('');
-    return html;
+    var html = order.map(function (k) { return parts[k] ? parts[k]() : ''; }).join('');
+    // Without the big picture at the top, start the page with a little air under the menu.
+    return order[0] === 'hero' ? html : '<div class="home-top"></div>' + html;
   }
 
   function viewJournal(catId) {
@@ -234,6 +246,22 @@
       '.</p></aside>';
   }
 
+  function pagesPublished() {
+    return (data.pages || []).filter(function (p) { return p.status !== 'draft'; });
+  }
+
+  function viewPage(slug) {
+    var pg = pagesPublished().filter(function (p) { return p.slug === slug; })[0];
+    if (!pg) return viewNotFound();
+    var p = photo(pg.photo);
+    setTitle(pg.title);
+    return '<div class="page-head wrap"><h1>' + esc(pg.title || '') + '</h1>' +
+      (pg.dek ? '<p>' + esc(pg.dek) + '</p>' : '') + '</div>' +
+      (p ? '<figure class="about-photo">' + img(pg.photo, { eager: true }) +
+        (p.caption || p.credit ? '<figcaption>' + esc(p.caption || '') + (p.credit ? ' · ' + esc(p.credit) : '') + '</figcaption>' : '') + '</figure>' : '') +
+      '<div class="prose">' + MD.render(pg.body, { photo: photo, imageUrl: url }) + '</div>';
+  }
+
   function viewCredits() {
     setTitle(T('creditsTitle'));
     var list = (data.photos || []).filter(function (p) { return MD.safeUrl(p.src); });
@@ -257,16 +285,35 @@
 
   // ---------- chrome ----------
 
-  function drawNav(route) {
+  function menuItems() {
     var hidden = data.site.menuHidden || [];
-    var items = [{ href: '#/', label: T('navHome'), key: 'home' }]
-      .concat((data.categories || []).map(function (c) { return { href: '#/journal/' + encodeURIComponent(c.id), label: c.name, key: 'cat:' + c.id }; }))
-      .concat([{ href: '#/gallery', label: T('navGallery'), key: 'gallery' }, { href: '#/about', label: T('navAbout'), key: 'about' }])
-      .filter(function (it) { return hidden.indexOf(it.key) < 0; });
+    var pages = pagesPublished();
+    return window.FCCStructure.menuKeys(data).filter(function (k) { return hidden.indexOf(k) < 0; }).map(function (k) {
+      if (k === 'home') return { key: k, href: '#/', label: T('navHome') };
+      if (k === 'gallery') return { key: k, href: '#/gallery', label: T('navGallery') };
+      if (k === 'about') return { key: k, href: '#/about', label: T('navAbout') };
+      var id = k.slice(k.indexOf(':') + 1);
+      if (k.indexOf('cat:') === 0) {
+        var c = category(id);
+        return c && { key: k, href: '#/journal/' + encodeURIComponent(c.id), label: c.name };
+      }
+      if (k.indexOf('page:') === 0) {
+        var pg = pages.filter(function (p) { return p.id === id; })[0];
+        return pg && { key: k, href: '#/page/' + encodeURIComponent(pg.slug), label: pg.menuLabel || pg.title };
+      }
+      var l = (data.site.menuLinks || []).filter(function (x) { return x.id === id; })[0];
+      var href = l && MD.safeUrl(l.url);
+      return href && { key: k, href: href, label: l.label || l.url, external: /^(https?:)?\/\//i.test(href) };
+    }).filter(Boolean);
+  }
+
+  function drawNav(route) {
     var current = route.name === 'home' ? 'home' : route.name === 'journal' && route.arg ? 'cat:' + route.arg :
-      route.name === 'article' ? 'cat:' + ((published().filter(function (a) { return a.slug === route.arg; })[0] || {}).category) : route.name;
-    document.getElementById('nav-list').innerHTML = items.map(function (it) {
-      return '<li><a href="' + it.href + '"' + (it.key === current ? ' aria-current="page"' : '') + '>' + esc(it.label) + '</a></li>';
+      route.name === 'article' ? 'cat:' + ((published().filter(function (a) { return a.slug === route.arg; })[0] || {}).category) :
+      route.name === 'page' ? 'page:' + ((pagesPublished().filter(function (p) { return p.slug === route.arg; })[0] || {}).id) : route.name;
+    document.getElementById('nav-list').innerHTML = menuItems().map(function (it) {
+      return '<li><a href="' + esc(it.href) + '"' + (it.key === current ? ' aria-current="page"' : '') +
+        (it.external ? ' target="_blank" rel="noopener noreferrer"' : '') + '>' + esc(it.label) + '</a></li>';
     }).join('');
   }
 
@@ -304,6 +351,7 @@
       case 'gallery': html = viewGallery(); break;
       case 'about': html = viewAbout(); break;
       case 'credits': html = viewCredits(); break;
+      case 'page': html = viewPage(r.arg); break;
       default: html = viewNotFound();
     }
     main.innerHTML = html;

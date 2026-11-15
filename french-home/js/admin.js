@@ -27,6 +27,7 @@
     previewMode: 'edits',  // 'edits' (unpublished, from the admin) | 'live' (what is published)
     previewDevice: 'desktop',
     editing: null,         // article id being edited
+    editingPage: null,     // extra page id being edited (Menu & wording tab)
     search: '',
     slugFollowsTitle: new Set(),
     busy: false
@@ -332,6 +333,7 @@
     json.categories = json.categories || [];
     json.articles = json.articles || [];
     json.photos = json.photos || [];
+    json.pages = json.pages || [];
     state.data = json;
     state.base = clone(json);
     state.baseSha = sha;
@@ -476,6 +478,10 @@
     d.categories.forEach((c) => { if (c.photo === p.id || c.photo === p.src) uses.push('Photo for the category “' + c.name + '”'); });
     if (d.site.aboutPhoto === p.id || d.site.aboutPhoto === p.src) uses.push('The about page');
     if (refRe.test(d.site.about || '')) uses.push('Inside the about page text');
+    (d.pages || []).forEach((pg) => {
+      if (pg.photo === p.id || pg.photo === p.src) uses.push('Photo on the page “' + (pg.title || 'Untitled page') + '”');
+      if (refRe.test(pg.body || '')) uses.push('Inside the page “' + (pg.title || 'Untitled page') + '”');
+    });
     return uses;
   }
 
@@ -496,6 +502,7 @@
     d.photos = d.photos.filter((x) => x !== p);
     d.articles.forEach((a) => { if (a.cover === p.id || a.cover === p.src) a.cover = ''; });
     d.categories.forEach((c) => { if (c.photo === p.id || c.photo === p.src) c.photo = ''; });
+    (d.pages || []).forEach((pg) => { if (pg.photo === p.id || pg.photo === p.src) pg.photo = ''; });
     if (d.site.aboutPhoto === p.id || d.site.aboutPhoto === p.src) d.site.aboutPhoto = '';
     if (state.newPhotos.has(p.src)) state.newPhotos.delete(p.src);
     else if (/^content\//.test(p.src) && !d.photos.some((x) => x.src === p.src)) state.deleted.add(p.src);
@@ -562,6 +569,7 @@
     n += diffById(b.categories, d.categories);
     n += diffById(b.articles, d.articles);
     n += diffById(b.photos, d.photos);
+    n += diffById(b.pages || [], d.pages || []);
     // Deleting a file whose record changed elsewhere is already counted with the record.
     return n;
   }
@@ -602,6 +610,7 @@
   $$('.tabs [data-tab]').forEach((b) => b.addEventListener('click', () => {
     state.tab = b.getAttribute('data-tab');
     if (state.tab !== 'articles') state.editing = null;
+    if (state.tab !== 'wording') state.editingPage = null;
     render();
   }));
 
@@ -624,6 +633,29 @@
   // Articles
   // ===================================================================
 
+  // Published state as it is on the website now (last publish), and as it will be after the next one.
+  function liveStatus(a) {
+    const was = (state.base.articles || []).find((x) => x.id === a.id);
+    return was ? (was.status === 'draft' ? 'draft' : 'published') : 'new';
+  }
+
+  function statusBadge(a) {
+    const now = a.status === 'draft' ? 'draft' : 'published';
+    const live = liveStatus(a);
+    if (now === 'published' && live === 'published') return '<span class="badge pub">On the site</span>';
+    if (now === 'draft' && live !== 'published') return '<span class="badge draft">Unpublished</span>';
+    if (now === 'draft') return '<span class="badge pending">Comes off the site when you press Publish</span>';
+    return '<span class="badge pending">Goes on the site when you press Publish</span>';
+  }
+
+  function toggleArticle(a) {
+    a.status = a.status === 'draft' ? 'published' : 'draft';
+    changed();
+    const live = liveStatus(a);
+    if (a.status === 'draft') toast(live === 'published' ? '“' + (a.title || 'Untitled story') + '” will come off the site when you press Publish.' : 'Unpublished.');
+    else toast(live === 'published' ? 'Back on the site.' : '“' + (a.title || 'Untitled story') + '” will go on the site when you press Publish.');
+  }
+
   function renderArticleList() {
     const q = state.search.trim().toLowerCase();
     const list = state.data.articles.slice()
@@ -633,15 +665,16 @@
       '<div class="view-head"><h1>Stories</h1><button type="button" class="primary" id="new-article">+ New story</button></div>' +
       '<div class="toolbar-row"><input type="search" id="a-search" placeholder="Search stories…" aria-label="Search stories" value="' + esc(state.search) + '">' +
       '<span class="hint" style="margin:0">' + state.data.articles.length + ' stories · ' +
-      state.data.articles.filter((a) => a.status === 'draft').length + ' drafts</span></div>' +
+      state.data.articles.filter((a) => a.status === 'draft').length + ' unpublished</span></div>' +
       (list.length ? '<ul class="alist">' + list.map((a) =>
-        '<li><button type="button" data-edit="' + esc(a.id) + '">' +
+        '<li class="arow"><button type="button" data-edit="' + esc(a.id) + '">' +
         '<div class="thumb">' + imgTag(a.cover, '') + '</div>' +
         '<div><div class="t">' + esc(a.title || 'Untitled story') + '</div>' +
         '<div class="m">' + esc(categoryName(a.category)) + ' · ' + esc(fmtDate(a.date)) + '</div></div>' +
-        '<div class="badges">' + (a.featured ? '<span class="badge feat">Featured</span>' : '') +
-        (a.status === 'draft' ? '<span class="badge draft">Draft</span>' : '<span class="badge pub">Published</span>') + '</div>' +
-        '</button></li>').join('') + '</ul>'
+        '<div class="badges">' + (a.featured ? '<span class="badge feat">Featured</span>' : '') + statusBadge(a) + '</div>' +
+        '</button>' +
+        '<button type="button" class="small pubtoggle' + (a.status === 'draft' ? '' : ' unpub') + '" data-toggle-pub="' + esc(a.id) + '">' +
+        (a.status === 'draft' ? 'Put on the site' : 'Unpublish') + '</button></li>').join('') + '</ul>'
         : '<p class="hint">No stories match.</p>');
 
     const s = $('#a-search');
@@ -652,6 +685,12 @@
       const s2 = $('#a-search'); s2.focus(); s2.setSelectionRange(pos, pos);
     });
     $('#new-article').addEventListener('click', newArticle);
+    $$('[data-toggle-pub]').forEach((b) => b.addEventListener('click', () => {
+      const a = state.data.articles.find((x) => x.id === b.getAttribute('data-toggle-pub'));
+      if (!a) return;
+      toggleArticle(a);
+      renderArticleList();
+    }));
     $$('[data-edit]').forEach((b) => b.addEventListener('click', () => { state.editing = b.getAttribute('data-edit'); render(); window.scrollTo(0, 0); }));
   }
 
@@ -753,6 +792,7 @@
       '<div class="view-head"><button type="button" id="back-list">&larr; All stories</button>' +
       '<h1 style="margin-left:6px">' + esc(a.title || 'New story') + '</h1>' +
       '<a class="button" id="view-live" target="_blank" rel="noopener" href="index.html#/article/' + encodeURIComponent(a.slug) + '">View on site</a></div>' +
+      '<div class="status-box" id="a-status"></div>' +
       '<div class="editor">' +
       '<div class="panel">' +
       '<div class="field"><label for="f-title">Title</label><input type="text" id="f-title" data-f="title" value="' + esc(a.title) + '" placeholder="A headline for the story"></div>' +
@@ -817,7 +857,18 @@
       changed();
     });
 
-    $('#f-published').addEventListener('change', (e) => { a.status = e.target.checked ? 'published' : 'draft'; changed(); });
+    const drawStatus = () => {
+      const on = a.status !== 'draft';
+      const live = liveStatus(a);
+      const line = on
+        ? (live === 'published' ? 'This story is <strong>on the site</strong>.' : 'This story <strong>goes on the site when you press Publish</strong>.')
+        : (live === 'published' ? 'This story is unpublished: it <strong>comes off the site when you press Publish</strong>.' : 'This story is <strong>unpublished</strong>: only you can see it, here in the admin.');
+      $('#a-status').innerHTML = '<p style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin:0"><span>' + line + '</span>' +
+        '<button type="button" class="small' + (on ? ' danger' : ' primary') + '" id="a-toggle">' + (on ? 'Unpublish' : 'Put on the site') + '</button></p>';
+      $('#a-toggle').addEventListener('click', () => { toggleArticle(a); $('#f-published').checked = a.status !== 'draft'; drawStatus(); });
+    };
+    drawStatus();
+    $('#f-published').addEventListener('change', (e) => { a.status = e.target.checked ? 'published' : 'draft'; changed(); drawStatus(); });
     $('#f-featured').addEventListener('change', (e) => {
       if (e.target.checked) {
         const others = state.data.articles.filter((x) => x !== a && x.featured);
@@ -1053,33 +1104,95 @@
       '<p class="hint" data-w-hint="' + key + '"' + (val === def ? ' hidden' : '') + '>Original: “' + esc(def) + '” · <button type="button" class="link" data-w-reset="' + key + '">Restore</button></p></div>';
   }
 
+  const STRUCT = window.FCCStructure;
+
+  function menuRow(key, i, total) {
+    const d = state.data;
+    const id = key.slice(key.indexOf(':') + 1);
+    let input = '', kind = '', extra = '';
+    if (key === 'home' || key === 'gallery' || key === 'about') {
+      const lk = { home: 'navHome', gallery: 'navGallery', about: 'navAbout' }[key];
+      input = '<input type="text" aria-label="Menu name" data-w="' + lk + '" value="' + esc(wordingValue(lk)) + '">';
+      kind = { home: 'Home page', gallery: 'Gallery', about: 'About page' }[key];
+    } else if (key.indexOf('cat:') === 0) {
+      const c = d.categories.find((x) => x.id === id);
+      input = '<input type="text" aria-label="Menu name" data-catname="' + esc(id) + '" value="' + esc(c.name) + '">';
+      kind = 'Category';
+    } else if (key.indexOf('page:') === 0) {
+      const pg = d.pages.find((x) => x.id === id);
+      input = '<input type="text" aria-label="Menu name" data-pagemenu="' + esc(id) + '" value="' + esc(pg.menuLabel || pg.title || '') + '" placeholder="Untitled page">';
+      kind = 'Your page' + (pg.status === 'draft' ? ' (draft)' : '');
+      extra = '<button type="button" class="small" data-editpage="' + esc(id) + '">Edit page</button>';
+    } else {
+      const l = (d.site.menuLinks || []).find((x) => x.id === id);
+      input = '<div class="link-inputs"><input type="text" aria-label="Link name" data-linklabel="' + esc(id) + '" value="' + esc(l.label || '') + '" placeholder="Name in the menu">' +
+        '<input type="text" aria-label="Link address" data-linkurl="' + esc(id) + '" value="' + esc(l.url || '') + '" placeholder="https://…" spellcheck="false" autocapitalize="off"></div>';
+      kind = 'Link';
+      extra = '<button type="button" class="danger small" data-dellink="' + esc(id) + '" aria-label="Remove link">Remove</button>';
+    }
+    return '<div class="menu-row">' +
+      '<div class="move"><button type="button" class="small" data-mmove="-1" data-key="' + esc(key) + '"' + (i === 0 ? ' disabled' : '') + ' aria-label="Move up">&uarr;</button>' +
+      '<button type="button" class="small" data-mmove="1" data-key="' + esc(key) + '"' + (i === total - 1 ? ' disabled' : '') + ' aria-label="Move down">&darr;</button></div>' +
+      input + '<span class="menu-kind">' + kind + '</span>' +
+      '<label class="check"><input type="checkbox" data-menu-show="' + esc(key) + '"' + (isHidden(key) ? '' : ' checked') + '> Show</label>' + extra + '</div>';
+  }
+
+  function moveIn(list, item, dir) {
+    const i = list.indexOf(item), j = i + dir;
+    if (i < 0 || j < 0 || j >= list.length) return list;
+    list.splice(i, 1); list.splice(j, 0, item);
+    return list;
+  }
+
+  function pageSlug(base, ownId) {
+    let slug = slugify(base), n = 2;
+    const taken = (x) => state.data.pages.some((pg) => pg.slug === x && pg.id !== ownId);
+    while (taken(slug)) slug = slugify(base) + '-' + n++;
+    return slug;
+  }
+
   function renderWording() {
-    const cats = state.data.categories;
-    const menuRows = [['home', 'navHome', null]]
-      .concat(cats.map((c) => ['cat:' + c.id, null, c]))
-      .concat([['gallery', 'navGallery', null], ['about', 'navAbout', null]]);
+    if (state.editingPage) { renderPageEditor(); return; }
+    const d = state.data;
+    const keys = STRUCT.menuKeys(d);
+    const homeHidden = d.site.homeHidden || [];
+    const homeKeys = STRUCT.homeKeys(d.site);
+    const sectionName = Object.fromEntries(STRUCT.HOME_SECTIONS);
     view().innerHTML =
       '<div class="view-head"><h1>Menu &amp; wording</h1>' +
-      '<button type="button" data-tab-go="preview">See it in Preview</button>' +
-      '<button type="button" class="danger" id="w-reset-all">Restore all original wording</button></div>' +
-      '<p class="hint" style="margin-top:-8px;margin-bottom:16px">Change the names in the menu and the fixed text around the site. Empty a box to go back to the original. Nothing goes live until you press Publish.</p>' +
+      '<button type="button" data-tab-go="preview">See it in Preview</button></div>' +
+      '<p class="hint" style="margin-top:-8px;margin-bottom:16px">Arrange the menu, add your own pages and links, lay out the home page, and change the text around the site. Nothing goes live until you press Publish.</p>' +
 
-      '<div class="panel" style="margin-bottom:18px"><h2 style="font-size:26px;margin-bottom:6px">Menu</h2>' +
-      '<p class="hint" style="margin-bottom:12px">In the order shown on the site. Renaming a category here renames it everywhere (its web address stays the same); reorder categories in Site settings.</p>' +
-      '<div class="menu-rows">' + menuRows.map(([key, labelKey, cat]) =>
-        '<div class="menu-row">' +
-        '<input type="text" aria-label="Menu name" ' + (cat ? 'data-catname="' + esc(cat.id) + '" value="' + esc(cat.name) + '"' : 'data-w="' + labelKey + '" value="' + esc(wordingValue(labelKey)) + '"') + '>' +
-        '<span class="menu-kind">' + (cat ? 'Category' : key === 'home' ? 'Home page' : key === 'gallery' ? 'Gallery page' : 'About page') + '</span>' +
-        '<label class="check"><input type="checkbox" data-menu-show="' + esc(key) + '"' + (isHidden(key) ? '' : ' checked') + '> Show in menu</label>' +
-        '</div>').join('') + '</div>' +
-      '<div class="grid2" style="margin-top:14px">' + wordingField('menuButton', 'Menu button on phones') + '</div>' +
+      '<div class="panel" style="margin-bottom:18px"><h2 class="ph2">Menu</h2>' +
+      '<p class="hint" style="margin-bottom:12px">Use the arrows to change the order. Untick <em>Show</em> to leave an item out of the menu (the page itself still exists). Renaming a category here renames it everywhere.</p>' +
+      '<div class="menu-rows">' + keys.map((k, i) => menuRow(k, i, keys.length)).join('') + '</div>' +
+      '<div class="toolbar-row" style="margin-top:14px"><button type="button" class="primary" id="add-page">+ Add a page</button>' +
+      '<button type="button" id="add-link">+ Add a link</button></div>' +
+      '<p class="hint">A page is a new page of your site with its own text and photo (for example “Our story” or “Contact”). A link takes visitors to another address, such as your shop or Instagram.</p>' +
+      '<div class="grid2" style="margin-top:10px">' + wordingField('menuButton', 'Menu button on phones') + '</div>' +
       '</div>' +
 
+      '<div class="panel" style="margin-bottom:18px"><h2 class="ph2">Home page layout</h2>' +
+      '<p class="hint" style="margin-bottom:12px">The sections of the home page, from top to bottom. Stories fill them newest first, so no story appears twice.</p>' +
+      '<div class="menu-rows">' + homeKeys.map((k, i) =>
+        '<div class="menu-row home-row">' +
+        '<div class="move"><button type="button" class="small" data-hmove="-1" data-key="' + k + '"' + (i === 0 ? ' disabled' : '') + ' aria-label="Move up">&uarr;</button>' +
+        '<button type="button" class="small" data-hmove="1" data-key="' + k + '"' + (i === homeKeys.length - 1 ? ' disabled' : '') + ' aria-label="Move down">&darr;</button></div>' +
+        '<span class="sec-name">' + esc(sectionName[k]) + '</span>' +
+        (k === 'latest' || k === 'more'
+          ? '<label class="count">Stories <input type="number" min="1" max="12" data-hcount="' + k + '" value="' + STRUCT.count(d.site[k + 'Count'], k === 'latest' ? 3 : 6) + '"></label>'
+          : '<span></span>') +
+        '<label class="check"><input type="checkbox" data-home-show="' + k + '"' + (homeHidden.indexOf(k) >= 0 ? '' : ' checked') + '> Show</label></div>').join('') + '</div>' +
+      '</div>' +
+
+      '<div class="view-head" style="margin:28px 0 10px"><h2 class="ph2" style="margin-right:auto">Wording</h2>' +
+      '<button type="button" class="danger small" id="w-reset-all">Restore all original wording</button></div>' +
       LABELS.GROUPS.filter((g) => g.title !== 'Menu').map((g) =>
-        '<div class="panel" style="margin-bottom:18px"><h2 style="font-size:26px;margin-bottom:6px">' + esc(g.title) + '</h2>' +
+        '<div class="panel" style="margin-bottom:18px"><h2 class="ph2">' + esc(g.title) + '</h2>' +
         (g.note ? '<p class="hint" style="margin-bottom:12px">' + esc(g.note) + '</p>' : '') +
         '<div class="grid2">' + g.items.map((it) => wordingField(it[0], it[1])).join('') + '</div></div>').join('');
 
+    // wording boxes
     $$('[data-w]').forEach((el) => el.addEventListener('input', () => {
       const key = el.getAttribute('data-w');
       setWording(key, el.value);
@@ -1095,22 +1208,158 @@
       $$('[data-w="' + key + '"]').forEach((el) => { el.value = LABELS.DEFAULTS[key]; });
       $('[data-w-hint="' + key + '"]').hidden = true;
     }));
+
+    // menu
     $$('[data-catname]').forEach((el) => el.addEventListener('input', () => {
-      const c = state.data.categories.find((x) => x.id === el.getAttribute('data-catname'));
+      const c = d.categories.find((x) => x.id === el.getAttribute('data-catname'));
       if (c && el.value.trim()) { c.name = el.value; changed(); }
     }));
+    $$('[data-pagemenu]').forEach((el) => el.addEventListener('input', () => {
+      const pg = d.pages.find((x) => x.id === el.getAttribute('data-pagemenu'));
+      if (!pg) return;
+      if (!el.value.trim() || el.value === pg.title) delete pg.menuLabel; else pg.menuLabel = el.value;
+      changed();
+    }));
+    $$('[data-linklabel]').forEach((el) => el.addEventListener('input', () => {
+      const l = d.site.menuLinks.find((x) => x.id === el.getAttribute('data-linklabel')); l.label = el.value; changed();
+    }));
+    $$('[data-linkurl]').forEach((el) => el.addEventListener('input', () => {
+      const l = d.site.menuLinks.find((x) => x.id === el.getAttribute('data-linkurl')); l.url = el.value.trim(); changed();
+    }));
+    $$('[data-linkurl]').forEach((el) => el.addEventListener('change', () => {
+      let v = el.value.trim();
+      if (v && !/^(https?:|mailto:|#|\/)/i.test(v) && /\./.test(v)) { v = 'https://' + v; el.value = v; }
+      if (v && !MD.safeUrl(v)) toast('That address can’t be used as a link.', true);
+      d.site.menuLinks.find((x) => x.id === el.getAttribute('data-linkurl')).url = v;
+      changed();
+    }));
+    $$('[data-dellink]').forEach((b) => b.addEventListener('click', () => {
+      const id = b.getAttribute('data-dellink');
+      d.site.menuLinks = d.site.menuLinks.filter((x) => x.id !== id);
+      if (!d.site.menuLinks.length) delete d.site.menuLinks;
+      changed(); renderWording();
+    }));
+    $$('[data-editpage]').forEach((b) => b.addEventListener('click', () => {
+      state.editingPage = b.getAttribute('data-editpage'); render(); window.scrollTo(0, 0);
+    }));
     $$('[data-menu-show]').forEach((el) => el.addEventListener('change', () => {
-      if (!el.checked && state.data.categories.length + 3 - (state.data.site.menuHidden || []).length <= 1) {
-        el.checked = true; toast('Keep at least one item in the menu.', true); return;
-      }
+      const visible = STRUCT.menuKeys(d).length - (d.site.menuHidden || []).length;
+      if (!el.checked && visible <= 1) { el.checked = true; toast('Keep at least one item in the menu.', true); return; }
       setHidden(el.getAttribute('data-menu-show'), !el.checked);
     }));
+    $$('[data-mmove]').forEach((b) => b.addEventListener('click', () => {
+      d.site.menuOrder = moveIn(STRUCT.menuKeys(d), b.getAttribute('data-key'), Number(b.getAttribute('data-mmove')));
+      changed(); renderWording();
+      const again = $('[data-mmove="' + b.getAttribute('data-mmove') + '"][data-key="' + b.getAttribute('data-key') + '"]');
+      if (again && !again.disabled) again.focus();
+    }));
+    $('#add-page').addEventListener('click', () => {
+      const id = 'pg-' + Date.now().toString(36) + randomId(3);
+      d.pages.push({ id, slug: pageSlug('new-page', id), title: '', dek: '', photo: '', body: '', status: 'published' });
+      state.slugFollowsTitle.add(id);
+      state.editingPage = id;
+      changed(); render(); window.scrollTo(0, 0);
+      $('#pg-title').focus();
+    });
+    $('#add-link').addEventListener('click', () => {
+      d.site.menuLinks = (d.site.menuLinks || []).concat([{ id: 'ln-' + randomId(5), label: '', url: '' }]);
+      changed(); renderWording();
+      const inputs = $$('[data-linklabel]');
+      inputs[inputs.length - 1].focus();
+    });
+
+    // home page layout
+    $$('[data-hmove]').forEach((b) => b.addEventListener('click', () => {
+      d.site.homeOrder = moveIn(STRUCT.homeKeys(d.site), b.getAttribute('data-key'), Number(b.getAttribute('data-hmove')));
+      changed(); renderWording();
+    }));
+    $$('[data-home-show]').forEach((el) => el.addEventListener('change', () => {
+      const k = el.getAttribute('data-home-show');
+      const list = (d.site.homeHidden || []).filter((x) => x !== k);
+      if (!el.checked) list.push(k);
+      if (list.length) d.site.homeHidden = list; else delete d.site.homeHidden;
+      changed();
+    }));
+    $$('[data-hcount]').forEach((el) => el.addEventListener('change', () => {
+      const k = el.getAttribute('data-hcount');
+      const n = Math.max(1, Math.min(12, parseInt(el.value, 10) || (k === 'latest' ? 3 : 6)));
+      el.value = n;
+      if (n === (k === 'latest' ? 3 : 6)) delete d.site[k + 'Count']; else d.site[k + 'Count'] = n;
+      changed();
+    }));
+
     $('[data-tab-go]').addEventListener('click', () => { state.tab = 'preview'; render(); });
     $('#w-reset-all').addEventListener('click', async () => {
-      if (!(await confirmBox('Restore all original wording?', '<p>Every menu name and text on this page goes back to the original (category names and hidden menu items stay as they are).</p>', 'Restore all', true))) return;
-      delete state.data.site.labels;
+      if (!(await confirmBox('Restore all original wording?', '<p>Every menu name and text in the Wording section goes back to the original. Category names, pages, links, the menu order and the home page layout stay as they are.</p>', 'Restore all', true))) return;
+      delete d.site.labels;
       changed();
       renderWording();
+    });
+  }
+
+  function renderPageEditor() {
+    const pg = state.data.pages.find((x) => x.id === state.editingPage);
+    if (!pg) { state.editingPage = null; renderWording(); return; }
+    const key = 'page:' + pg.id;
+    view().innerHTML =
+      '<div class="view-head"><button type="button" id="pg-back">&larr; Menu &amp; wording</button>' +
+      '<h1 style="margin-left:6px">' + esc(pg.title || 'New page') + '</h1>' +
+      '<button type="button" data-tab-go="preview">See it in Preview</button></div>' +
+      '<div class="panel" style="margin-bottom:18px">' +
+      '<div class="field"><label for="pg-title">Page title</label><input type="text" id="pg-title" data-pf="title" value="' + esc(pg.title) + '" placeholder="For example: Our story"></div>' +
+      '<div class="field"><label for="pg-dek">Introduction (optional)</label><input type="text" id="pg-dek" data-pf="dek" value="' + esc(pg.dek || '') + '" placeholder="One line under the title"></div>' +
+      '<div class="field"><label>Photo (optional)</label><div class="cover-pick"><div class="thumb" id="pg-thumb">' + imgTag(pg.photo, '') + '</div>' +
+      '<button type="button" id="pg-photo">' + (pg.photo ? 'Change photo…' : 'Choose or upload a photo…') + '</button></div></div>' +
+      '</div>' +
+      '<div class="panel" style="margin-bottom:18px"><label for="pg-body">Text</label>' +
+      '<div class="write-split"><div>' + toolbarHtml('pg-body') +
+      '<textarea id="pg-body" data-pf="body" placeholder="Write the page… Leave a blank line between paragraphs.">' + esc(pg.body || '') + '</textarea></div>' +
+      '<div class="preview-pane"><div class="pv-label">Preview</div><div class="mini-prose" id="pg-preview"></div></div></div></div>' +
+      '<div class="panel">' +
+      '<label class="check"><input type="checkbox" id="pg-published"' + (pg.status !== 'draft' ? ' checked' : '') + '> Published on the site</label>' +
+      '<p class="hint" style="margin-bottom:12px">Untick to keep it as a draft: it stays out of the site and the menu.</p>' +
+      '<label class="check"><input type="checkbox" id="pg-inmenu"' + (isHidden(key) ? '' : ' checked') + '> Show in the menu</label>' +
+      '<p class="hint" style="margin-bottom:16px">If it is not in the menu, link to it from a story with its web address.</p>' +
+      '<div class="field" style="max-width:640px"><label for="pg-slug">Web address</label><div class="slug-row"><span>…#/page/</span>' +
+      '<input type="text" id="pg-slug" value="' + esc(pg.slug) + '" spellcheck="false" autocapitalize="off"></div></div>' +
+      '<div class="editor-actions"><button type="button" class="danger" id="pg-delete">Delete page</button>' +
+      '<button type="button" class="primary" id="pg-done">Done</button></div></div>';
+
+    const preview = () => { $('#pg-preview').innerHTML = renderMd(pg.body) || '<p class="hint">Your text will appear here as you type.</p>'; };
+    preview();
+    $$('[data-pf]').forEach((el) => el.addEventListener('input', () => {
+      const f = el.getAttribute('data-pf');
+      pg[f] = el.value;
+      if (f === 'title') {
+        $('.view-head h1').textContent = pg.title || 'New page';
+        if (state.slugFollowsTitle.has(pg.id)) { pg.slug = pageSlug(pg.title || 'new-page', pg.id); $('#pg-slug').value = pg.slug; }
+      }
+      if (f === 'body') preview();
+      changed();
+    }));
+    $('#pg-slug').addEventListener('input', () => state.slugFollowsTitle.delete(pg.id));
+    $('#pg-slug').addEventListener('change', (e) => { pg.slug = pageSlug(e.target.value || pg.title || 'page', pg.id); e.target.value = pg.slug; changed(); });
+    $('#pg-published').addEventListener('change', (e) => { pg.status = e.target.checked ? 'published' : 'draft'; changed(); });
+    $('#pg-inmenu').addEventListener('change', (e) => setHidden(key, !e.target.checked));
+    $('#pg-photo').addEventListener('click', async () => {
+      const id = await choosePhoto('Photo for this page', pg.photo, true);
+      if (id === null) return;
+      pg.photo = id; changed();
+      $('#pg-thumb').innerHTML = imgTag(id, '');
+      $('#pg-photo').textContent = id ? 'Change photo…' : 'Choose or upload a photo…';
+    });
+    const back = () => { state.editingPage = null; render(); };
+    $('#pg-back').addEventListener('click', back);
+    $('#pg-done').addEventListener('click', back);
+    $('[data-tab-go]').addEventListener('click', () => { state.editingPage = null; state.tab = 'preview'; render(); });
+    $('#pg-delete').addEventListener('click', async () => {
+      if (!(await confirmBox('Delete this page?', '<p>“' + esc(pg.title || 'Untitled page') + '” and its place in the menu are removed when you next publish. Its photo stays in the Photos tab.</p>', 'Delete page', true))) return;
+      state.data.pages = state.data.pages.filter((x) => x !== pg);
+      setHidden(key, false);
+      if (state.data.site.menuOrder) state.data.site.menuOrder = state.data.site.menuOrder.filter((k) => k !== key);
+      state.editingPage = null;
+      changed(); render();
+      toast('Page deleted. Remember to publish.');
     });
   }
 
@@ -1215,6 +1464,8 @@
       '</ol>' +
       '<p>If you close the page before publishing, the browser will warn you — unpublished changes live only in this tab.</p>' +
       '<p>If someone else (or you, on another device) published in the meantime, the admin notices and asks before overwriting their changes. To be safe, sign out and back in to load the latest version before starting new work.</p>' +
+      '<h2>Menu, pages and home page layout</h2>' +
+      '<p>In <em>Menu &amp; wording</em>: use the arrows to put the menu in any order and untick <em>Show</em> to leave items out. <em>+ Add a page</em> creates a new page of the site (title, introduction, photo and text, written like a story) and <em>+ Add a link</em> adds a link to another website. Under <em>Home page layout</em>, move the home page sections up or down, switch them off, and choose how many stories they show.</p>' +
       '<h2>Menu and wording</h2>' +
       '<p>In <em>Menu &amp; wording</em> you can rename the menu items (Home, the categories, Gallery, About), hide items from the menu, and change the fixed text around the site: section headings on the home page, buttons, page titles and the footer. Empty a box, or press <em>Restore</em>, to go back to the original wording.</p>' +
       '<h2>Previewing the site</h2>' +
@@ -1290,6 +1541,9 @@
 
     const problems = state.data.articles.filter((a) => a.status !== 'draft' && !a.title.trim());
     if (problems.length) { await alertBox('A story needs a title', '<p>Every published story needs a title. Give it one, or untick “Published on the site”.</p>'); return; }
+    if (state.data.pages.some((pg) => pg.status !== 'draft' && !(pg.title || '').trim())) {
+      await alertBox('A page needs a title', '<p>Every published page needs a title. Find it under Menu &amp; wording.</p>'); return;
+    }
 
     state.busy = true;
     const btn = $('#publish-btn');
