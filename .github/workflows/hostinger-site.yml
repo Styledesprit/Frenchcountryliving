@@ -1,0 +1,45 @@
+# Copies the French Country Club magazine (french-home/) to the root of the
+# "hostinger-site" branch whenever it changes on main, so Hostinger's Git
+# deployment can serve the magazine at the root of thefrenchcountryclub.com.
+# The admin keeps publishing to french-home/ on main; this branch is generated
+# from it and should never be edited by hand.
+name: Update hostinger-site branch
+on:
+  push:
+    branches: [main]
+    paths: ['french-home/**']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: hostinger-site
+  cancel-in-progress: false
+jobs:
+  copy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update hostinger-site
+        env:
+          REPO_URL: https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git
+        run: |
+          set -e
+          SITE="$RUNNER_TEMP/site"
+          if git ls-remote --exit-code --heads "$REPO_URL" hostinger-site >/dev/null; then
+            git clone -q --depth 1 --branch hostinger-site "$REPO_URL" "$SITE"
+          else
+            mkdir -p "$SITE" && git -C "$SITE" init -q -b hostinger-site
+            git -C "$SITE" remote add origin "$REPO_URL"
+          fi
+          # Replace everything with the current magazine (keeping the branch's history).
+          find "$SITE" -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -r french-home/. "$SITE/"
+          rm -f "$SITE/README.md"
+          printf 'Generated from french-home/ on main by .github/workflows/hostinger-site.yml.\nDo not edit this branch: use the admin, or change french-home/ on main.\n' > "$SITE/GENERATED.txt"
+          cd "$SITE"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898900+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then echo "No changes."; exit 0; fi
+          git commit -q -m "Magazine from main@${GITHUB_SHA::7}"
+          git push -q origin HEAD:hostinger-site
