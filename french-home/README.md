@@ -22,43 +22,52 @@ french-home/
     └── photos/         the photo files
 ```
 
-## 1. Switch on GitHub Pages
+## 1. Put the site online
 
-1. On GitHub, open the repository and go to **Settings → Pages**.
-2. Under **Build and deployment**, set **Source** to **Deploy from a branch**.
-3. Choose your default branch (usually `main`) and the folder **/ (root)**, then press **Save**.
-4. After a minute or two, GitHub shows the address at the top of that page. The site is then at
+The repository also contains Itinerary Studio (a separate app at the repository root). Two
+GitHub Actions workflows in `.github/workflows/` publish the magazine whenever `main` changes —
+including every time you press **Publish** in the admin:
 
-   - Site: `https://<owner>.github.io/<repository>/french-home/`
-   - Admin: `https://<owner>.github.io/<repository>/french-home/admin.html`
+- `deploy.yml` builds Itinerary Studio and publishes it to **GitHub Pages** together with this
+  folder, so the magazine is at `/french-home/` there.
+- `hostinger-site.yml` copies this folder on its own to the **`hostinger-site`** branch, with the
+  magazine at the top level. That branch is what Hostinger serves. It is generated: never edit it
+  by hand.
 
-   (`https://<owner>.github.io/<repository>/` redirects to the site.)
+### On thefrenchcountryclub.com (Hostinger)
 
-Every time something is published to the default branch, GitHub Pages rebuilds the site
-automatically. The repository's **Actions** tab shows the progress ("pages build and deployment").
-
-### Or: host it on Hostinger
-
-The site is plain files, so any web host works. On Hostinger you can let it pull the site from
-GitHub automatically, so the admin's **Publish** button updates your Hostinger site too:
-
-1. In **hPanel**, open **Websites → Manage** for your domain, then **Advanced → GIT**.
-2. Repository: `https://github.com/Styledesprit/Frenchcountryliving.git`, branch `main`, and leave
-   the install directory empty (the repository goes into `public_html`). `public_html` must be
-   empty the first time. If the repository is private, first use the SSH key shown on that
-   page: add it on GitHub under the repository's **Settings → Deploy keys**, and use the address
-   `git@github.com:Styledesprit/Frenchcountryliving.git` instead.
+1. In **hPanel**, open **Websites → Manage** for thefrenchcountryclub.com, then
+   **Advanced → GIT**.
+2. Repository: `https://github.com/Styledesprit/Frenchcountryliving.git`, branch
+   **`hostinger-site`**, and leave the install directory empty (the files go into `public_html`,
+   which must be empty the first time). If the repository is private, first add the SSH key
+   shown on that page on GitHub under the repository's **Settings → Deploy keys**, and use the
+   address `git@github.com:Styledesprit/Frenchcountryliving.git` instead.
 3. Press **Create**, then **Deploy** once.
 4. Turn on **Auto deployment** and copy the webhook address it shows. On GitHub, open the
    repository's **Settings → Webhooks → Add webhook**, paste it as the *Payload URL* and save
-   (the "just the push event" default is right). From now on every publish reaches Hostinger
-   within a few seconds.
+   (the "just the push event" default is right).
 
-The site is then at `https://<your-domain>/french-home/` (`https://<your-domain>/` redirects
-there) and the admin at `https://<your-domain>/french-home/admin.html`. The admin already knows
-which repository to publish to: it's set in the `fcc-repo` line near the top of `admin.html`.
-If a change doesn't appear, clear the cache in hPanel (**Performance → Cache Manager**, if it is
-switched on). You can use GitHub Pages and Hostinger at the same time, or just one of them.
+The `hostinger-site` branch appears the first time the workflow runs: after this folder reaches
+`main`, or straight away from **Actions → Update hostinger-site branch → Run workflow**.
+
+- Site: `https://thefrenchcountryclub.com/`
+- Admin: `https://thefrenchcountryclub.com/admin.html`
+
+The admin already knows which repository and folder to publish to (the `fcc-repo` and
+`fcc-folder` lines near the top of `admin.html`). After you publish, the site updates in a minute
+or two: the workflow copies the change to `hostinger-site`, then Hostinger pulls it. If a change
+doesn't appear, clear the cache in hPanel (**Performance → Cache Manager**, if it is switched on).
+
+### On GitHub Pages (optional)
+
+1. On GitHub, open the repository's **Settings → Pages**.
+2. Under **Build and deployment**, set **Source** to **GitHub Actions**.
+3. Push to `main` (or run **Actions → Deploy to GitHub Pages → Run workflow**). The **Actions**
+   tab shows the progress.
+
+- Site: `https://<owner>.github.io/<repository>/french-home/`
+- Admin: `https://<owner>.github.io/<repository>/french-home/admin.html`
 
 ## 2. Create a GitHub token for the admin
 
