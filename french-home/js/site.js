@@ -13,6 +13,7 @@
   var MD = window.FCCMarkdown;
   var esc = MD.escapeHtml;
   var data = null;
+  var T = window.FCCLabels.make();   // the site's wording; replaced once site.json is loaded
   var main = document.getElementById('main');
   var lightboxList = [];
   var lightboxIndex = 0;
@@ -78,7 +79,7 @@
       catLabel(a) +
       '<h3>' + esc(a.title) + '</h3>' +
       (a.dek ? '<p>' + esc(a.dek) + '</p>' : '') +
-      '<div class="meta">' + fmtDate(a.date) + '<span class="dot">·</span>' + MD.readingMinutes(a.body) + ' min read</div>' +
+      '<div class="meta">' + fmtDate(a.date) + '<span class="dot">·</span>' + MD.readingMinutes(a.body) + ' ' + esc(T('minRead')) + '</div>' +
       '</a>';
   }
 
@@ -90,7 +91,7 @@
 
   function viewHome() {
     var list = published();
-    if (!list.length) return '<div class="wrap"><p class="empty">No stories yet.</p></div>';
+    if (!list.length) return '<div class="wrap"><p class="empty">' + esc(T('noStories')) + '</p></div>';
     var hero = list.filter(function (a) { return a.featured; })[0] || list[0];
     var rest = list.filter(function (a) { return a !== hero; });
     var latest = rest.slice(0, 3);
@@ -106,16 +107,16 @@
       catLabel(hero) +
       '<h1><a href="' + articleHref(hero) + '">' + esc(hero.title) + '</a></h1>' +
       (hero.dek ? '<p class="dek">' + esc(hero.dek) + '</p>' : '') +
-      '<a class="btn" href="' + articleHref(hero) + '">Read the story</a>' +
+      '<a class="btn" href="' + articleHref(hero) + '">' + esc(T('heroButton')) + '</a>' +
       '</div></div></section>';
 
     if (latest.length) {
-      html += '<section class="section wrap"><div class="section-head"><h2>Latest from the club</h2>' +
-        '<a href="#/journal">All stories</a></div><div class="cards">' + latest.map(card).join('') + '</div></section>';
+      html += '<section class="section wrap"><div class="section-head"><h2>' + esc(T('latestTitle')) + '</h2>' +
+        '<a href="#/journal">' + esc(T('latestLink')) + '</a></div><div class="cards">' + latest.map(card).join('') + '</div></section>';
     }
 
     if ((data.categories || []).length) {
-      html += '<section class="section wrap"><div class="section-head"><h2>Explore the club</h2></div><div class="tiles">' +
+      html += '<section class="section wrap"><div class="section-head"><h2>' + esc(T('exploreTitle')) + '</h2></div><div class="tiles">' +
         data.categories.map(function (c) {
           return '<a class="tile" href="#/journal/' + encodeURIComponent(c.id) + '"><div class="ratio">' + img(c.photo, { alt: '' }) + '</div>' +
             '<div class="tile-text"><strong>' + esc(c.name) + '</strong>' + (c.blurb ? '<span>' + esc(c.blurb) + '</span>' : '') + '</div></a>';
@@ -127,7 +128,7 @@
         '<div class="ratio">' + img(feature.cover, { alt: '' }) + '</div>' +
         '<div class="feature-text">' + catLabel(feature) + '<h2>' + esc(feature.title) + '</h2>' +
         (feature.dek ? '<p class="dek">' + esc(feature.dek) + '</p>' : '') +
-        '<div class="meta">' + fmtDate(feature.date) + '<span class="dot">·</span>' + MD.readingMinutes(feature.body) + ' min read</div>' +
+        '<div class="meta">' + fmtDate(feature.date) + '<span class="dot">·</span>' + MD.readingMinutes(feature.body) + ' ' + esc(T('minRead')) + '</div>' +
         '</div></a></section>';
     }
 
@@ -137,13 +138,13 @@
     }
 
     if (more.length) {
-      html += '<section class="section wrap"><div class="section-head"><h2>From the journal</h2>' +
-        '<a href="#/journal">More stories</a></div><div class="cards">' + more.map(card).join('') + '</div></section>';
+      html += '<section class="section wrap"><div class="section-head"><h2>' + esc(T('moreTitle')) + '</h2>' +
+        '<a href="#/journal">' + esc(T('moreLink')) + '</a></div><div class="cards">' + more.map(card).join('') + '</div></section>';
     }
 
     if (strip.length) {
-      html += '<section class="section wrap"><div class="section-head"><h2>Seen in the countryside</h2>' +
-        '<a href="#/gallery">The gallery</a></div><div class="strip">' +
+      html += '<section class="section wrap"><div class="section-head"><h2>' + esc(T('stripTitle')) + '</h2>' +
+        '<a href="#/gallery">' + esc(T('stripLink')) + '</a></div><div class="strip">' +
         strip.map(function (p) {
           return '<a href="#/gallery" aria-label="' + esc(p.caption || 'Open the gallery') + '"><div class="ratio r-1x1">' + img(p.id) + '</div></a>';
         }).join('') + '</div></section>';
@@ -156,16 +157,16 @@
     var c = catId ? category(catId) : null;
     var list = published().filter(function (a) { return !catId || a.category === catId; });
     var head = c
-      ? '<div class="page-head wrap"><span class="kicker">The journal</span><h1>' + esc(c.name) + '</h1>' + (c.blurb ? '<p>' + esc(c.blurb) + '</p>' : '') + '</div>'
-      : '<div class="page-head wrap"><span class="kicker">' + esc(data.site.name) + '</span><h1>The journal</h1><p>Every story from the club, newest first.</p></div>';
-    var filters = '<ul class="filters"><li><a href="#/journal"' + (!catId ? ' aria-current="true"' : '') + '>All stories</a></li>' +
+      ? '<div class="page-head wrap"><span class="kicker">' + esc(T('journalKicker')) + '</span><h1>' + esc(c.name) + '</h1>' + (c.blurb ? '<p>' + esc(c.blurb) + '</p>' : '') + '</div>'
+      : '<div class="page-head wrap"><span class="kicker">' + esc(data.site.name) + '</span><h1>' + esc(T('journalTitle')) + '</h1><p>' + esc(T('journalIntro')) + '</p></div>';
+    var filters = '<ul class="filters"><li><a href="#/journal"' + (!catId ? ' aria-current="true"' : '') + '>' + esc(T('allStories')) + '</a></li>' +
       (data.categories || []).map(function (x) {
         return '<li><a href="#/journal/' + encodeURIComponent(x.id) + '"' + (x.id === catId ? ' aria-current="true"' : '') + '>' + esc(x.name) + '</a></li>';
       }).join('') + '</ul>';
-    setTitle(c ? c.name : 'The journal');
+    setTitle(c ? c.name : T('journalTitle'));
     if (catId && !c) return viewNotFound();
     return head + '<div class="wrap">' + filters +
-      (list.length ? '<div class="cards">' + list.map(card).join('') + '</div>' : '<p class="empty">No stories here yet — check back soon.</p>') +
+      (list.length ? '<div class="cards">' + list.map(card).join('') + '</div>' : '<p class="empty">' + esc(T('emptyCategory')) + '</p>') +
       '</div>';
   }
 
@@ -190,16 +191,16 @@
           (cover.credit ? ' <span class="credit">' + esc(cover.credit) + '</span>' : '') + '</figcaption>' : '') + '</figure>' : '') +
       '<header class="article-head">' + catLabel(a, true) + '<h1>' + esc(a.title) + '</h1>' +
       (a.dek ? '<p class="dek">' + esc(a.dek) + '</p>' : '') +
-      '<div class="meta">' + (a.author ? 'By ' + esc(a.author) + '<span class="dot">·</span>' : '') +
-      '<time datetime="' + esc(a.date) + '">' + fmtDate(a.date) + '</time><span class="dot">·</span>' + MD.readingMinutes(a.body) + ' min read</div></header>' +
+      '<div class="meta">' + (a.author ? esc(T('byline')) + ' ' + esc(a.author) + '<span class="dot">·</span>' : '') +
+      '<time datetime="' + esc(a.date) + '">' + fmtDate(a.date) + '</time><span class="dot">·</span>' + MD.readingMinutes(a.body) + ' ' + esc(T('minRead')) + '</div></header>' +
       '<div class="prose">' + body + '</div>' +
-      '<div class="article-foot"><div class="byline-box">Have a story, a correction or a photograph to share? ' +
-      (data.site.email ? '<a href="mailto:' + esc(data.site.email) + '">Write to the club</a>.' : 'Write to the club.') + '</div>' +
+      '<div class="article-foot"><div class="byline-box">' + esc(T('shareLine')) + ' ' +
+      (data.site.email ? '<a href="mailto:' + esc(data.site.email) + '">' + esc(T('shareLink')) + '</a>.' : esc(T('shareLink')) + '.') + '</div>' +
       '<nav class="prevnext" aria-label="More stories">' +
-      (older ? '<a class="prev" href="' + articleHref(older) + '"><span>&larr; Previous story</span><strong>' + esc(older.title) + '</strong></a>' : '<div class="blank"></div>') +
-      (newer ? '<a class="next" href="' + articleHref(newer) + '"><span>Next story &rarr;</span><strong>' + esc(newer.title) + '</strong></a>' : '<div class="blank"></div>') +
+      (older ? '<a class="prev" href="' + articleHref(older) + '"><span>&larr; ' + esc(T('prevStory')) + '</span><strong>' + esc(older.title) + '</strong></a>' : '<div class="blank"></div>') +
+      (newer ? '<a class="next" href="' + articleHref(newer) + '"><span>' + esc(T('nextStory')) + ' &rarr;</span><strong>' + esc(newer.title) + '</strong></a>' : '<div class="blank"></div>') +
       '</nav></div></article>' +
-      (related.length ? '<section class="section wrap"><div class="section-head"><h2>You may also enjoy</h2><a href="#/journal">All stories</a></div>' +
+      (related.length ? '<section class="section wrap"><div class="section-head"><h2>' + esc(T('relatedTitle')) + '</h2><a href="#/journal">' + esc(T('latestLink')) + '</a></div>' +
         '<div class="cards">' + related.map(card).join('') + '</div></section>' : '');
   }
 
@@ -209,35 +210,35 @@
 
   function viewGallery() {
     var list = galleryPhotos();
-    setTitle('Gallery');
-    return '<div class="page-head wrap"><span class="kicker">' + esc(data.site.name) + '</span><h1>The gallery</h1>' +
+    setTitle(T('galleryTitle'));
+    return '<div class="page-head wrap"><span class="kicker">' + esc(data.site.name) + '</span><h1>' + esc(T('galleryTitle')) + '</h1>' +
       (data.site.galleryIntro ? '<p>' + esc(data.site.galleryIntro) + '</p>' : '') + '</div>' +
       '<div class="wrap">' + (list.length ? '<div class="masonry">' + list.map(function (p, i) {
         return '<button type="button" data-lb="' + i + '" aria-label="View larger: ' + esc(p.caption || 'photo') + '">' + img(p.id) +
           (p.caption ? '<span class="g-cap">' + esc(p.caption) + '</span>' : '') + '</button>';
-      }).join('') + '</div>' : '<p class="empty">No photos yet.</p>') + '</div>';
+      }).join('') + '</div>' : '<p class="empty">' + esc(T('noPhotos')) + '</p>') + '</div>';
   }
 
   function viewAbout() {
     var s = data.site;
     var p = photo(s.aboutPhoto);
-    setTitle(s.aboutTitle || 'About');
-    return '<div class="page-head wrap"><span class="kicker">About</span><h1>' + esc(s.aboutTitle || 'About the club') + '</h1>' +
+    setTitle(s.aboutTitle || T('aboutKicker'));
+    return '<div class="page-head wrap"><span class="kicker">' + esc(T('aboutKicker')) + '</span><h1>' + esc(s.aboutTitle || 'About the club') + '</h1>' +
       (s.description ? '<p>' + esc(s.description) + '</p>' : '') + '</div>' +
       (p ? '<figure class="about-photo">' + img(s.aboutPhoto, { eager: true }) +
         (p.caption || p.credit ? '<figcaption>' + esc(p.caption || '') + (p.credit ? ' · ' + esc(p.credit) : '') + '</figcaption>' : '') + '</figure>' : '') +
       '<div class="prose">' + MD.render(s.about, { photo: photo, imageUrl: url }) + '</div>' +
-      '<aside class="write-in"><h2>Write in</h2><p>Letters, photographs and stories from readers are always welcome.' +
+      '<aside class="write-in"><h2>' + esc(T('writeInTitle')) + '</h2><p>' + esc(T('writeInText')) +
       (s.email ? ' Write to <a href="mailto:' + esc(s.email) + '">' + esc(s.email) + '</a>' : '') +
       (s.instagram ? (s.email ? ' or' : '') + ' find us on Instagram at <a href="https://www.instagram.com/' + esc(encodeURIComponent(s.instagram.replace(/^@/, ''))) + '/" target="_blank" rel="noopener noreferrer">@' + esc(s.instagram.replace(/^@/, '')) + '</a>' : '') +
       '.</p></aside>';
   }
 
   function viewCredits() {
-    setTitle('Photo credits');
+    setTitle(T('creditsTitle'));
     var list = (data.photos || []).filter(function (p) { return MD.safeUrl(p.src); });
-    return '<div class="page-head wrap"><span class="kicker">' + esc(data.site.name) + '</span><h1>Photo credits</h1>' +
-      '<p>With thanks to the photographers whose work appears in the journal.</p></div>' +
+    return '<div class="page-head wrap"><span class="kicker">' + esc(data.site.name) + '</span><h1>' + esc(T('creditsTitle')) + '</h1>' +
+      '<p>' + esc(T('creditsIntro')) + '</p></div>' +
       '<ul class="credits wrap">' + list.map(function (p) {
         var src = MD.safeUrl(p.sourceUrl);
         return '<li><div class="ratio">' + img(p.id, { alt: '' }) + '</div><div>' +
@@ -249,17 +250,19 @@
   }
 
   function viewNotFound() {
-    setTitle('Not found');
-    return '<div class="page-head wrap"><h1>Lost in the lanes</h1><p>We couldn’t find that page. Perhaps it was moved, or is still being written.</p>' +
-      '<p style="margin-top:28px"><a class="btn" href="#/">Back to the club</a></p></div>';
+    setTitle(T('notFoundTitle'));
+    return '<div class="page-head wrap"><h1>' + esc(T('notFoundTitle')) + '</h1><p>' + esc(T('notFoundText')) + '</p>' +
+      '<p style="margin-top:28px"><a class="btn" href="#/">' + esc(T('notFoundButton')) + '</a></p></div>';
   }
 
   // ---------- chrome ----------
 
   function drawNav(route) {
-    var items = [{ href: '#/', label: 'Home', key: 'home' }]
+    var hidden = data.site.menuHidden || [];
+    var items = [{ href: '#/', label: T('navHome'), key: 'home' }]
       .concat((data.categories || []).map(function (c) { return { href: '#/journal/' + encodeURIComponent(c.id), label: c.name, key: 'cat:' + c.id }; }))
-      .concat([{ href: '#/gallery', label: 'Gallery', key: 'gallery' }, { href: '#/about', label: 'About', key: 'about' }]);
+      .concat([{ href: '#/gallery', label: T('navGallery'), key: 'gallery' }, { href: '#/about', label: T('navAbout'), key: 'about' }])
+      .filter(function (it) { return hidden.indexOf(it.key) < 0; });
     var current = route.name === 'home' ? 'home' : route.name === 'journal' && route.arg ? 'cat:' + route.arg :
       route.name === 'article' ? 'cat:' + ((published().filter(function (a) { return a.slug === route.arg; })[0] || {}).category) : route.name;
     document.getElementById('nav-list').innerHTML = items.map(function (it) {
@@ -272,16 +275,16 @@
     var ig = s.instagram ? s.instagram.replace(/^@/, '') : '';
     document.getElementById('footer').innerHTML = '<div class="wrap"><div class="footer-grid">' +
       '<div><p class="f-name">' + esc(s.name) + '</p><p class="f-tag">' + esc(s.tagline) + '</p><p>' + esc(s.description || '') + '</p></div>' +
-      '<div><h2>The journal</h2><ul>' + (data.categories || []).map(function (c) {
+      '<div><h2>' + esc(T('footerJournal')) + '</h2><ul>' + (data.categories || []).map(function (c) {
         return '<li><a href="#/journal/' + encodeURIComponent(c.id) + '">' + esc(c.name) + '</a></li>';
-      }).join('') + '<li><a href="#/gallery">Gallery</a></li></ul></div>' +
-      '<div><h2>Write to us</h2><ul>' +
+      }).join('') + '<li><a href="#/gallery">' + esc(T('navGallery')) + '</a></li></ul></div>' +
+      '<div><h2>' + esc(T('footerContact')) + '</h2><ul>' +
       (s.email ? '<li><a href="mailto:' + esc(s.email) + '">' + esc(s.email) + '</a></li>' : '') +
       (ig ? '<li><a href="https://www.instagram.com/' + esc(encodeURIComponent(ig)) + '/" target="_blank" rel="noopener noreferrer">Instagram @' + esc(ig) + '</a></li>' : '') +
-      '<li><a href="#/about">About the club</a></li>' +
-      '<li><a href="#/credits">Photo credits</a></li></ul></div>' +
+      '<li><a href="#/about">' + esc(T('footerAbout')) + '</a></li>' +
+      '<li><a href="#/credits">' + esc(T('footerCredits')) + '</a></li></ul></div>' +
       '</div><div class="footer-bottom"><span>&copy; ' + new Date().getFullYear() + ' ' + esc(s.name) + (s.author ? ' · ' + esc(s.author) : '') + '</span>' +
-      '<span><a href="#/credits">Photo credits</a> · <a href="login/">Admin</a></span></div></div>';
+      '<span><a href="#/credits">' + esc(T('footerCredits')) + '</a> · <a href="login/">' + esc(T('footerAdmin')) + '</a></span></div></div>';
   }
 
   function parseRoute() {
@@ -383,6 +386,7 @@
   // ---------- start ----------
 
   function fillStatic() {
+    document.getElementById('menu-label').textContent = T('menuButton');
     document.querySelectorAll('[data-site]').forEach(function (el) {
       var v = data.site[el.getAttribute('data-site')];
       if (v) el.textContent = v;
@@ -400,9 +404,9 @@
     var robots = document.createElement('meta');
     robots.name = 'robots'; robots.content = 'noindex';
     document.head.appendChild(robots);
-    document.title = data.site.name + ' — back soon';
+    document.title = data.site.name + ' — ' + T('maintTitle');
     main.innerHTML = '<div class="page-head wrap maintenance-note"><span class="kicker">' + esc(data.site.name) + '</span>' +
-      '<h1>Back very soon</h1><p>' + esc(data.site.maintenanceMessage ||
+      '<h1>' + esc(T('maintTitle')) + '</h1><p>' + esc(data.site.maintenanceMessage ||
         'The shutters are closed for a little while as we tidy the house. Please come back soon.') + '</p>' +
       (data.site.email ? '<p class="maint-contact"><a href="mailto:' + esc(data.site.email) + '">' + esc(data.site.email) + '</a></p>' : '') + '</div>';
   }
@@ -411,6 +415,7 @@
   function start(json, ignoreMaintenance) {
     data = json;
     data.site = data.site || {};
+    T = window.FCCLabels.make(data.site.labels);
     fillStatic();
     if (data.site.maintenance && !ignoreMaintenance && !/[?&]preview(=|&|$)/.test(location.search)) { showMaintenance(); return; }
     drawFooter();
