@@ -35,6 +35,14 @@
     return null;
   }
 
+  // In the admin's Preview tab, photos uploaded but not yet published are shown from the
+  // admin's memory (blob: URLs). imageMap maps a stored src to such a URL.
+  var imageMap = {};
+  function url(src) {
+    var s = MD.safeUrl(src);
+    return (s && imageMap[s]) || s;
+  }
+
   function category(id) {
     return (data.categories || []).filter(function (c) { return c.id === id; })[0] || null;
   }
@@ -43,7 +51,7 @@
     opts = opts || {};
     var p = photo(ref);
     if (!p || !MD.safeUrl(p.src)) return '<div class="ph" aria-hidden="true"></div>';
-    return '<img src="' + esc(MD.safeUrl(p.src)) + '" alt="' + esc(opts.alt != null ? opts.alt : (p.caption || '')) + '"' +
+    return '<img src="' + esc(url(p.src)) + '" alt="' + esc(opts.alt != null ? opts.alt : (p.caption || '')) + '"' +
       (opts.eager ? ' fetchpriority="high"' : ' loading="lazy"') + ' decoding="async">';
   }
 
@@ -174,7 +182,7 @@
     list.forEach(function (x) { if (x !== a && related.indexOf(x) < 0) related.push(x); });
     related = related.slice(0, 3);
 
-    var body = MD.render(a.body, { photo: photo });
+    var body = MD.render(a.body, { photo: photo, imageUrl: url });
     setTitle(a.title);
     return '<article>' +
       (cover ? '<figure class="article-cover"><div class="img-wrap">' + img(a.cover, { eager: true }) + '</div>' +
@@ -218,7 +226,7 @@
       (s.description ? '<p>' + esc(s.description) + '</p>' : '') + '</div>' +
       (p ? '<figure class="about-photo">' + img(s.aboutPhoto, { eager: true }) +
         (p.caption || p.credit ? '<figcaption>' + esc(p.caption || '') + (p.credit ? ' · ' + esc(p.credit) : '') + '</figcaption>' : '') + '</figure>' : '') +
-      '<div class="prose">' + MD.render(s.about, { photo: photo }) + '</div>' +
+      '<div class="prose">' + MD.render(s.about, { photo: photo, imageUrl: url }) + '</div>' +
       '<aside class="write-in"><h2>Write in</h2><p>Letters, photographs and stories from readers are always welcome.' +
       (s.email ? ' Write to <a href="mailto:' + esc(s.email) + '">' + esc(s.email) + '</a>' : '') +
       (s.instagram ? (s.email ? ' or' : '') + ' find us on Instagram at <a href="https://www.instagram.com/' + esc(encodeURIComponent(s.instagram.replace(/^@/, ''))) + '/" target="_blank" rel="noopener noreferrer">@' + esc(s.instagram.replace(/^@/, '')) + '</a>' : '') +
@@ -329,7 +337,7 @@
     if (!lightboxList.length) return;
     lightboxIndex = (i + lightboxList.length) % lightboxList.length;
     var p = lightboxList[lightboxIndex];
-    lbImg.src = MD.safeUrl(p.src);
+    lbImg.src = url(p.src);
     lbImg.alt = p.caption || '';
     lbCap.innerHTML = esc(p.caption || '') + (p.credit ? '<small>' + esc(p.credit) + (p.license ? ' · ' + esc(p.license) : '') + '</small>' : '');
     lbCount.textContent = (lightboxIndex + 1) + ' / ' + lightboxList.length;
@@ -399,17 +407,37 @@
       (data.site.email ? '<p class="maint-contact"><a href="mailto:' + esc(data.site.email) + '">' + esc(data.site.email) + '</a></p>' : '') + '</div>';
   }
 
+  var started = false;
+  function start(json, ignoreMaintenance) {
+    data = json;
+    data.site = data.site || {};
+    fillStatic();
+    if (data.site.maintenance && !ignoreMaintenance && !/[?&]preview(=|&|$)/.test(location.search)) { showMaintenance(); return; }
+    drawFooter();
+    var y = window.scrollY;
+    route();
+    if (started) window.scrollTo(0, y);   // a live preview refresh keeps the reader's place
+    if (!started) window.addEventListener('hashchange', route);
+    started = true;
+  }
+
+  // Admin preview: inside the admin's Preview tab the page shows the admin's unpublished
+  // content, sent by the admin page (same site only), instead of content/site.json.
+  if (/[?&]adminpreview(=|&|$)/.test(location.search) && window.parent !== window) {
+    window.addEventListener('message', function (e) {
+      if (e.origin !== location.origin || e.source !== window.parent) return;
+      var msg = e.data || {};
+      if (msg.type !== 'fcc-preview-data' || !msg.data) return;
+      imageMap = msg.images || {};
+      start(msg.data, true);
+    });
+    window.parent.postMessage({ type: 'fcc-preview-ready' }, location.origin);
+    return;
+  }
+
   fetch('content/site.json', { cache: 'no-cache' })
     .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-    .then(function (json) {
-      data = json;
-      data.site = data.site || {};
-      fillStatic();
-      if (data.site.maintenance && !/[?&]preview(=|&|$)/.test(location.search)) { showMaintenance(); return; }
-      drawFooter();
-      route();
-      window.addEventListener('hashchange', route);
-    })
+    .then(function (json) { start(json, false); })
     .catch(function (err) {
       main.innerHTML = '<div class="page-head wrap"><h1>The journal is resting</h1><p>The stories could not be loaded just now (' +
         esc(err.message) + '). Please try again in a moment.</p></div>';

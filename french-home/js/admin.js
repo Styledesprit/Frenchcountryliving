@@ -24,6 +24,8 @@
     deleted: new Set(),    // repo-relative src of published photos to delete
     localUrls: new Map(),  // src -> object URL, so fresh photos show before GitHub Pages rebuilds
     tab: 'articles',
+    previewMode: 'edits',  // 'edits' (unpublished, from the admin) | 'live' (what is published)
+    previewDevice: 'desktop',
     editing: null,         // article id being edited
     search: '',
     slugFollowsTitle: new Set(),
@@ -606,6 +608,7 @@
     if (state.tab === 'articles') state.editing ? renderEditor() : renderArticleList();
     else if (state.tab === 'photos') renderPhotos();
     else if (state.tab === 'settings') renderSettings();
+    else if (state.tab === 'preview') renderPreview();
     else renderHelp();
   }
 
@@ -1008,6 +1011,73 @@
   }
 
   // ===================================================================
+  // Preview: the whole site, even in maintenance mode
+  // ===================================================================
+
+  const DEVICES = { desktop: '100%', tablet: '820px', phone: '390px' };
+
+  function renderPreview() {
+    const n = changeCount();
+    const live = state.mode === 'preview' ? 'Published version' : 'Live site';
+    view().innerHTML =
+      '<div class="view-head"><h1>Preview</h1>' +
+      '<a class="button" href="index.html?preview" target="_blank" rel="noopener">Open the live site in a new tab</a></div>' +
+      '<div class="preview-bar">' +
+      '<div class="seg" role="group" aria-label="What to show">' +
+      '<button type="button" data-pmode="edits" aria-pressed="' + (state.previewMode === 'edits') + '">With my changes' + (n ? ' (' + n + ' unpublished)' : '') + '</button>' +
+      '<button type="button" data-pmode="live" aria-pressed="' + (state.previewMode === 'live') + '">' + live + '</button></div>' +
+      '<div class="seg" role="group" aria-label="Screen size">' +
+      Object.keys(DEVICES).map((d) => '<button type="button" data-pdev="' + d + '" aria-pressed="' + (state.previewDevice === d) + '">' +
+        d.charAt(0).toUpperCase() + d.slice(1) + '</button>').join('') +
+      '</div></div>' +
+      '<p class="hint" id="preview-note">' + previewNote() + '</p>' +
+      '<div class="preview-stage"><iframe id="preview-frame" title="Site preview" style="width:' + DEVICES[state.previewDevice] + '" src="' +
+      previewSrc('#/') + '"></iframe></div>';
+
+    $$('[data-pmode]').forEach((b) => b.addEventListener('click', () => {
+      const hash = currentPreviewHash();
+      state.previewMode = b.getAttribute('data-pmode');
+      $$('[data-pmode]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      $('#preview-note').innerHTML = previewNote();
+      $('#preview-frame').src = previewSrc(hash);
+    }));
+    $$('[data-pdev]').forEach((b) => b.addEventListener('click', () => {
+      state.previewDevice = b.getAttribute('data-pdev');
+      $$('[data-pdev]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      $('#preview-frame').style.width = DEVICES[state.previewDevice];
+    }));
+  }
+
+  function previewSrc(hash) {
+    return (state.previewMode === 'edits' ? 'index.html?adminpreview' : 'index.html?preview&t=' + Date.now()) + (hash || '#/');
+  }
+
+  function currentPreviewHash() {
+    try { return $('#preview-frame').contentWindow.location.hash || '#/'; } catch (e) { return '#/'; }
+  }
+
+  function previewNote() {
+    const maint = state.data.site.maintenance
+      ? ' Maintenance mode is on, so visitors currently see only the “back soon” notice. This preview shows the whole site anyway.' : '';
+    return (state.previewMode === 'edits'
+      ? 'Showing the site as it will look once you publish, including unpublished stories, photos and settings. Drafts stay hidden, as on the real site.'
+      : 'Showing what is published right now. A publish can take a minute or two to appear.') + maint;
+  }
+
+  // The preview page asks for content when it loads; send it the admin's working copy.
+  function sendPreview() {
+    const f = $('#preview-frame');
+    if (!f || !f.contentWindow || state.previewMode !== 'edits') return;
+    f.contentWindow.postMessage({ type: 'fcc-preview-data', data: state.data, images: Object.fromEntries(state.localUrls) }, location.origin);
+  }
+
+  window.addEventListener('message', (e) => {
+    const f = $('#preview-frame');
+    if (!f || e.origin !== location.origin || e.source !== f.contentWindow) return;
+    if (e.data && e.data.type === 'fcc-preview-ready') sendPreview();
+  });
+
+  // ===================================================================
   // Help
   // ===================================================================
 
@@ -1022,6 +1092,9 @@
       '</ol>' +
       '<p>If you close the page before publishing, the browser will warn you — unpublished changes live only in this tab.</p>' +
       '<p>If someone else (or you, on another device) published in the meantime, the admin notices and asks before overwriting their changes. To be safe, sign out and back in to load the latest version before starting new work.</p>' +
+      '<h2>Previewing the site</h2>' +
+      '<p>The <em>Preview</em> tab shows the whole site inside the admin, even while maintenance mode hides it from visitors. ' +
+      '<em>With my changes</em> shows how it will look after you publish; <em>Live site</em> shows what is published now. Use <em>Phone</em> to check it at phone size.</p>' +
       '<h2>Maintenance mode</h2>' +
       '<p>To take the site offline for a while, tick <em>Maintenance mode</em> at the top of <em>Site settings</em>, write a short message and publish. Visitors then see only that notice. ' +
       'Add <code>?preview</code> to the site’s address to look at it yourself. Untick and publish again to reopen. It hides the site, but is not a password.</p>' +
